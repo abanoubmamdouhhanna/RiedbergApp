@@ -1,0 +1,20 @@
+import mongoose, { model, Schema, Types } from "mongoose";
+
+const problemSchema = new Schema(
+  {
+    problemTitle: {
+      type: String,
+      required: true,
+    },
+    problemDescription: {
+      type: String,
+      required: true,
+    },
+    problemImage: String,
+    createdBy: { type: Types.ObjectId, ref: "Employee", required: true },
+    creationDate: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+const problemModel = mongoose.models.Problem || model("Problem", problemSchema);
+export default problemModel;
