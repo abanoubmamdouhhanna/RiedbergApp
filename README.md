@@ -1,3 +1,6 @@
-
 # RiedbergApp
-![tol8](https://github.com/user-attachments/assets/561bdd3b-9453-475f-87c4-d81fc8e26ed7)
+
+## ![tol8](https://github.com/your-username/your-repo-name/raw/main/path-to-your-image.gif)
+<div style="text-align: right; margin-bottom: 10px;">
+    <img alt="Coding" width="400" src="https://github.com/your-username/your-repo-name/raw/main/path-to-your-image.gif">
+</div>
