@@ -152,7 +152,7 @@ export const getAppoitment =asyncHandler(async(req,res,next)=>
   const {appoinmentId}=req.params
   const appoinment=await appoinmentModel.findById(appoinmentId)
   if (!appoinment) {
-    return next(new Error("Invalid apponitment ID.", { cause: 404 }));
+    return next(new Error("Invalid apponitment ID.", { cause: 400 }));
   }
   return res.status(200).json({
     status: "success",

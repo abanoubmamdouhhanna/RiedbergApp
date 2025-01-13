@@ -8,7 +8,7 @@ export const auth = (accessRoles = []) => {
   return asyncHandler(async (req, res, next) => {
     const { authorization } = req.headers;
     if (!authorization) {
-      return next(new Error("Authorization is required", { cause: 400 }));
+      return next(new Error("Authorization is required", { cause: 401 }));
     }
     const decoded = verifyToken({
       payload: authorization,
@@ -33,7 +33,7 @@ export const auth = (accessRoles = []) => {
 
         break;
       default:
-        return next(new Error("Invalid role or no role found", { cause: 400 }));
+        return next(new Error("Invalid role", { cause: 401 }));
     }
 
     if (!authUser) {

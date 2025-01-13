@@ -11,9 +11,16 @@ export const glopalErrHandling = async (error, req, res, next) => {
     if (process.env.MOOD == "DEV") {
       return res
         .status(error.cause || 500)
-        .json({ message: error.message , error ,stack:error.stack});
+        .json({
+          message: error.message,
+          status_code: error.cause,
+          error,
+          stack: error.stack,
+        });
     } else {
-      return res.status(error.cause || 500).json({ message: error.message });
+      return res
+        .status(error.cause || 500)
+        .json({ message: error.message, status_code: error.cause });
     }
   }
 };

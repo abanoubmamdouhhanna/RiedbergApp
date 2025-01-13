@@ -122,7 +122,7 @@ export const updatePost = asyncHandler(async (req, res, next) => {
     new: true,
   });
   if (!updatePost) {
-    return next(new Error("Update post faild", { cause: 404 }));
+    return next(new Error( "Post not found, update failed.", { cause: 404 }));
   }
 
   return res.status(200).json({ message: "post updated", result: updatePost });
@@ -143,7 +143,7 @@ export const deletePost = asyncHandler(async (req, res, next) => {
   await commentModel.deleteMany({ postId });
   const deletedPost = await postModel.findByIdAndDelete(postId);
   if (!deletedPost) {
-    return next(new Error("Failed to delete the post", { cause: 500 }));
+    return next(new Error("Post not found, delete failed." , { cause: 404 }));
   }
   return res.status(200).json({
     status: "success",
@@ -196,7 +196,7 @@ export const createComment = asyncHandler(async (req, res, next) => {
 
   const post = await postModel.findById(postId);
   if (!post) {
-    return next(new Error("in-valid post id", { cause: 400 }));
+    return next(new Error("In-valid post ID", { cause: 400 }));
   }
   const comment = await commentModel.create({
     author: req.user.userName,
@@ -222,7 +222,7 @@ export let createReplyComment = asyncHandler(async (req, res, next) => {
 
   let comment = await commentModel.findOne({ _id: commentId });
   if (!comment) {
-    return next(new Error("in-valid comment id", { cause: 400 }));
+    return next(new Error("In-valid comment ID", { cause: 400 }));
   }
   let replyComment = await commentModel.create({
     commentContent,
@@ -360,7 +360,7 @@ export const updateMaintenance = asyncHandler(async (req, res, next) => {
     { new: true }
   );
   if (!updatedMaintenance) {
-    return next(new Error("Failed to update maintenance ", { cause: 404 }));
+    return next(new Error("Maintenance record not found or update failed.", { cause: 404 }));
   }
   return res.status(201).json({
     status: "success",

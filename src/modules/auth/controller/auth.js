@@ -75,13 +75,13 @@ export const logIn = asyncHandler(async (req, res, next) => {
   // Handle user not found
   if (!user) {
     return next(
-      new Error("Invalid credentials, please try again.", { cause: 404 })
+      new Error("User not found, please try again.", { cause: 404 })
     );
   }
 
   // Check if the account is deleted or blocked
   if (user.isDeleted) {
-    return next(new Error("This account has been deleted.", { cause: 403 }));
+    return next(new Error("This account has been deleted.", { cause: 410 }));
   }
   if (user.isBlocked) {
     return next(new Error("This account is blocked.", { cause: 403 }));

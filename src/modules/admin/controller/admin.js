@@ -56,7 +56,7 @@ export const addGallery = asyncHandler(async (req, res, next) => {
               imageDate: new Date().toISOString().split("T")[0],
             }))
             .catch(() => {
-              throw new Error("Failed to upload image"); // Error handling per image upload failure
+              throw new Error("Failed to upload image", { cause: 500 }); // Error handling per image upload failure
             })
         )
       );
@@ -104,7 +104,7 @@ export const updateGallery = asyncHandler(async (req, res, next) => {
               imageDate: new Date().toISOString().split("T")[0],
             }))
             .catch(() => {
-              throw new Error("Failed to upload image"); // Error handling per image upload failure
+              throw new Error("Failed to upload image",{ cause: 500 }); // Error handling per image upload failure
             })
         )
       );
@@ -280,7 +280,7 @@ export const updateAnnouncement = asyncHandler(async (req, res, next) => {
     { new: true }
   );
   if (!announcement) {
-    return next(new Error("Failed to update announcement ", { cause: 404 }));
+    return next(new Error("Announcement not found or failed to update", { cause: 404 }));
   }
   return res.status(200).json({
     status: "success",
@@ -318,7 +318,7 @@ export const updateFamily = asyncHandler(async (req, res, next) => {
       return next(
         new Error(
           "I'm sorry, but the username you have chosen is already taken",
-          { cause: 400 }
+          { cause: 409 }
         )
       );
     }
@@ -327,7 +327,7 @@ export const updateFamily = asyncHandler(async (req, res, next) => {
     return next(
       new Error(
         "Can't update your information because your account may be suspended or deleted",
-        { cause: 400 }
+        { cause: 403 }
       )
     );
   }
@@ -348,7 +348,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
   const { oldPassword, newPassword } = req.body;
   const checkUser = await userModel.findById(userId);
   if (!checkUser) {
-    return next(new Error("In-valid user ID", { cause: 404 }));
+    return next(new Error("In-valid user ID", { cause: 400 }));
   }
 
   const matchOld = compare({
@@ -356,7 +356,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
     hashValue: checkUser.password,
   });
   if (!matchOld) {
-    return next(new Error("In-valid password", { cause: 409 }));
+    return next(new Error("In-valid password", { cause: 400 }));
   }
   const checkMatchNew = compare({
     plainText: newPassword,
@@ -371,7 +371,9 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
   const user = await userModel
     .findByIdAndUpdate(
       { _id: userId },
-      { password: hashPassword },
+      { password: hashPassword,
+        changeAccountInfo:Date.now()
+       },
       { new: true }
     )
     .select("userName email updatedAt");

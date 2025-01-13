@@ -52,7 +52,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
       return next(
         new Error(
           "Invalid Maintenance Day format. Please provide a valid date in 'YYYY-MM-DD' format.",
-          { cause: 400 }
+          { cause: 422 }
         )
       );
     }
