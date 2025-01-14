@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as operationController from "./controller/operations.js";
 import { auth } from "../../middlewares/auth.middleware.js";
-import { fileUpload } from "../../utils/multerCloudinary.js";
+import { allowedTypesMap, fileUpload } from "../../utils/multerCloudinary.js";
 import { isValid } from "../../middlewares/validation.middleware.js";
 import {
   addMaintenanceSchema,
@@ -51,7 +51,7 @@ router.post(
   "/addPost",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin", "employee", "user"]),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "postImage",
       maxCount: 1,
@@ -66,7 +66,7 @@ router.patch(
   "/updatePost/:postId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin", "employee", "user"]),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "postImage",
       maxCount: 1,
@@ -146,7 +146,7 @@ router.post(
   "/addMaintenance",
   isValid(headersSchema, true),
   auth("user"),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "maintenanceImage",
       maxCount: 1,
@@ -161,7 +161,7 @@ router.patch(
   "/updateMaintenance/:maintenanceId",
   isValid(headersSchema, true),
   auth("user"),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "maintenanceImage",
       maxCount: 1,

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as adminController from "./controller/admin.js";
 import { auth } from "../../middlewares/auth.middleware.js";
-import { fileUpload } from "../../utils/multerCloudinary.js";
+import { allowedTypesMap, fileUpload } from "../../utils/multerCloudinary.js";
 import { isValid } from "../../middlewares/validation.middleware.js";
 import {
   addGallerySchema,
@@ -39,7 +39,7 @@ router.post(
   "/addGallery",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "galleryImages",
       maxCount: 5,
@@ -54,7 +54,7 @@ router.patch(
   "/updateGallery/:galleryId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "galleryImages",
       maxCount: 5,
@@ -69,7 +69,7 @@ router.patch(
   "/changeStatus/:maintenanceId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin", "employee"]),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "maintenanceStatusImage",
       maxCount: 1,
@@ -101,7 +101,7 @@ router.post(
   "/creatAnnouncement",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "announcementAttach",
       maxCount: 1,
@@ -116,7 +116,7 @@ router.patch(
   "/updateAnnouncement/:announcementId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "announcementAttach",
       maxCount: 1,

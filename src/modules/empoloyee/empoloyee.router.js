@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as employeeController from "./controller/empoloyee.js";
 import { auth } from "../../middlewares/auth.middleware.js";
-import { fileUpload } from "../../utils/multerCloudinary.js";
+import { allowedTypesMap, fileUpload } from "../../utils/multerCloudinary.js";
 import { isValid } from "../../middlewares/validation.middleware.js";
 import {
   createAppoinmentSchema,
@@ -37,7 +37,7 @@ router.post(
   "/createProblem/:userId",
   isValid(headersSchema, true),
   auth("employee"),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "problemImage",
       maxCount: 1,
@@ -52,7 +52,7 @@ router.post(
   "/createAppoinment",
   isValid(headersSchema, true),
   auth("employee"),
-  fileUpload(2).fields([
+  fileUpload(2,allowedTypesMap).fields([
     {
       name: "appoinmentAttachment",
       maxCount: 1,
