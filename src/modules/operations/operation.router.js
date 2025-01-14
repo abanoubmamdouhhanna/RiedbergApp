@@ -20,7 +20,6 @@ import {
 
 const router = Router();
 
-
 // profile
 router.get(
   "/profile",
@@ -51,7 +50,7 @@ router.post(
   "/addPost",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin", "employee", "user"]),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "postImage",
       maxCount: 1,
@@ -66,7 +65,7 @@ router.patch(
   "/updatePost/:postId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin", "employee", "user"]),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "postImage",
       maxCount: 1,
@@ -86,7 +85,17 @@ router.delete(
 );
 
 //get all posts
-router.get("/getPosts", operationController.getPosts);
+router.get("/getPosts",  isValid(headersSchema, true),
+auth(["admin", "superAdmin", "employee", "user"]),
+operationController.getPosts);
+
+//get user posts
+router.get(
+  "/getUserPosts",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin", "employee", "user"]),
+  operationController.getUserPosts
+);
 
 //create comment
 router.post(
@@ -146,7 +155,7 @@ router.post(
   "/addMaintenance",
   isValid(headersSchema, true),
   auth("user"),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "maintenanceImage",
       maxCount: 1,
@@ -161,7 +170,7 @@ router.patch(
   "/updateMaintenance/:maintenanceId",
   isValid(headersSchema, true),
   auth("user"),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "maintenanceImage",
       maxCount: 1,

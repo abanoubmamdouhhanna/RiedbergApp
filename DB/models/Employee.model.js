@@ -64,7 +64,7 @@ const employeeSchema = new Schema(
       ]
     }]
     ,changeAccountInfo: Date,
-    isDeleted: {
+      isDeleted: {
       type: Boolean,
       default: false,
     },

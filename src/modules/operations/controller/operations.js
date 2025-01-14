@@ -12,17 +12,19 @@ import adminModel from "../../../../DB/models/Admin.model.js";
 //profile
 
 export const profile = asyncHandler(async (req, res, next) => {
-  let model;
-  if (req.user.role === "user") {
-    model = userModel;
-  } else if (req.user.role === "employee") {
-    model = employeeModel;
-  }else if  (req.user.role === "admin" || req.user.role === "superAdmin")  {
-    model = adminModel;
-  }else {
-    return next(new Error("Invalid role", { cause: 400 }));
+  const roleModelMap = {
+    user: userModel,
+    employee: employeeModel,
+    admin: adminModel,
+    superAdmin: adminModel,
+  };
+
+  const model = roleModelMap[req.user.role];
+
+  if (!model) {
+    return next(new Error("Invalid role provided", { cause: 400 }));
   }
- 
+
   let profileQuery = await model.findOne({ _id: req.user._id });
 
   if (req.user.role === "user") {
@@ -31,11 +33,17 @@ export const profile = asyncHandler(async (req, res, next) => {
 
   const profile = await profileQuery;
   if (!profile) {
-    return next(new Error(`${req.user.role} profile not found`, { cause: 404 }));
+    return next(
+      new Error(`${req.user.role} profile not found`, { cause: 404 })
+    );
   }
   return res
     .status(200)
-    .json({ status: "Success", message: `${req.user.role} profile`,result:profile });
+    .json({
+      status: "Success",
+      message: `${req.user.role} profile`,
+      result: profile,
+    });
 });
 
 //====================================================================================================================//
@@ -118,11 +126,15 @@ export const updatePost = asyncHandler(async (req, res, next) => {
     );
     req.body.postImage = postImage.secure_url;
   }
-  const updatePost = await postModel.findByIdAndUpdate({ _id: postId }, req.body, {
-    new: true,
-  });
+  const updatePost = await postModel.findByIdAndUpdate(
+    { _id: postId },
+    req.body,
+    {
+      new: true,
+    }
+  );
   if (!updatePost) {
-    return next(new Error( "Post not found, update failed.", { cause: 404 }));
+    return next(new Error("Post not found, update failed.", { cause: 404 }));
   }
 
   return res.status(200).json({ message: "post updated", result: updatePost });
@@ -143,7 +155,7 @@ export const deletePost = asyncHandler(async (req, res, next) => {
   await commentModel.deleteMany({ postId });
   const deletedPost = await postModel.findByIdAndDelete(postId);
   if (!deletedPost) {
-    return next(new Error("Post not found, delete failed." , { cause: 404 }));
+    return next(new Error("Post not found, delete failed.", { cause: 404 }));
   }
   return res.status(200).json({
     status: "success",
@@ -177,7 +189,7 @@ export const getPosts = async (req, res, next) => {
     .find()
     .populate({
       path: "comments",
-      populate: populateReplies(1000), //Maximum call stack size :2379
+      populate: populateReplies(100), //Maximum call stack size :2379
     })
     .populate({
       path: "createdBy",
@@ -187,6 +199,39 @@ export const getPosts = async (req, res, next) => {
   return res.status(200).json({ message: "All posts", result: post });
 };
 
+//====================================================================================================================//
+//get user posts
+
+const populateUserReplies = (depth) => {
+  let populateConfig = {
+    path: "reply",
+    populate: {},
+  };
+
+  if (depth > 1) {
+    populateConfig.populate = populateUserReplies(depth - 1);
+  } else {
+    populateConfig.populate = {
+      path: "createdBy",
+      select: "userName email phone",
+    };
+  }
+
+  return populateConfig;
+};
+
+export const getUserPosts = async (req, res, next) => {
+
+   
+  const posts = await postModel
+    .find({createdBy:req.user._id})
+    .populate({
+      path: "comments",
+      populate: populateReplies(100), //Maximum call stack size :2379
+    })
+
+  return res.status(200).json({ message: "All posts", result: posts });
+};
 //====================================================================================================================//
 //add comment
 
@@ -355,12 +400,16 @@ export const updateMaintenance = asyncHandler(async (req, res, next) => {
     req.body.maintenanceImage = maintenanceImage.secure_url;
   }
   const updatedMaintenance = await maintenanceModel.findByIdAndUpdate(
-    {_id:maintenanceId, createdBy: req.user._id },
+    { _id: maintenanceId, createdBy: req.user._id },
     req.body,
     { new: true }
   );
   if (!updatedMaintenance) {
-    return next(new Error("Maintenance record not found or update failed.", { cause: 404 }));
+    return next(
+      new Error("Maintenance record not found or update failed.", {
+        cause: 404,
+      })
+    );
   }
   return res.status(201).json({
     status: "success",

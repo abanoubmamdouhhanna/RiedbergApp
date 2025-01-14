@@ -1,4 +1,4 @@
-import mongoose, { model, Schema } from "mongoose";
+import mongoose, { model, Schema, Types } from "mongoose";
 
 const adminSchema = new Schema(
   {
@@ -27,8 +27,8 @@ const adminSchema = new Schema(
     role: {
       type: String,
       default: "admin",
-      enum: ["admin","superAdmin"],
-    }
+      enum: ["admin", "superAdmin"],
+    },
   },
   { timestamps: true }
 );

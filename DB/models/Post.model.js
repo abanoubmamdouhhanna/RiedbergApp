@@ -23,7 +23,11 @@ const postSchema = new Schema(
         userType: { type: String, enum: ["User", "Admin", "Employee"], required: true }, // Role of the user
       },
     ],
-    authorType:String,
+    authorType: { 
+      type: String, 
+      required: true, 
+      enum: ['User', 'Admin', 'Employee'] // Ensure it matches valid model types
+    },
     postImage: String,
     comments: [{ type: Types.ObjectId, ref: "Comment" }],
     createdBy: { type: Types.ObjectId, required: true },
