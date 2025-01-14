@@ -82,68 +82,7 @@ export const createProblem = asyncHandler(async (req, res, next) => {
     result: addProblem,
   });
 });
-//====================================================================================================================//
-//create appointment
-export const createAppoinment = asyncHandler(async (req, res, next) => {
-  const { appoinmentAttachment } = req.files || {};
-  const { appoinmentTitle, appoinmentDate, appoinmentTime, reason } =
-    req.body;
 
-  if (!appoinmentTitle || !appoinmentDate || !appoinmentTime || !reason) {
-    return next(
-      new Error("Appoinment title ,date ,time and reason are required.", {
-        cause: 400,
-      })
-    );
-  }
-  const date = new Date(appoinmentDate);
-  if (isNaN(date.getTime())) {
-    return next(
-      new Error(
-        "Invalid appoinment date. Please provide a valid date in 'YYYY-MM-DD' format.",
-        { cause: 422 }
-      )
-    );
-  }
-  if (date < new Date().setHours(0, 0, 0, 0)) {
-    return next(
-      new Error("maintenanceDay must be today or in the future.", {
-        cause: 400,
-      })
-    );
-  }
-
-  if (appoinmentAttachment?.[0]?.path) {
-    try {
-      const customId = nanoid();
-      const uploadedAttachment = await cloudinary.uploader.upload(
-        appoinmentAttachment[0].path,
-        {
-          folder: `${process.env.APP_NAME}/Appointment/${customId}/appoinmentAttachment`,
-          public_id: `${customId}appoinmentAttachment`,
-        }
-      );
-      req.body.appoinmentAttachment = uploadedAttachment.secure_url;
-    } catch (error) {
-      return next(
-        new Error("Failed to upload appoinment attachment.", { cause: 500 })
-      );
-    }
-  }
-
-  req.body.employeeId = req.user._id;
-
-  const appoinment = await appoinmentModel.create(req.body);
-  if (!appoinment) {
-    return next(new Error("Failed to create appoinment.", { cause: 500 }));
-  }
- 
-  return res.status(201).json({
-    status: "success",
-    message: "Appoinment created successfully",
-    result: appoinment,
-  });
-});
 //====================================================================================================================//
 //get appoitment
 
@@ -172,3 +111,28 @@ export const profile=asyncHandler(async(req,res,next)=>
     result: employeesProfiles,
   });
 })
+
+//====================================================================================================================//
+//Fetch Available Times 
+
+export const getAvailableTimes = asyncHandler(async (req, res, next) => {
+  const { employeeId, date } = req.params;
+
+  const employee = await employeeModel.findById(employeeId);
+  if (!employee) {
+    return next(new Error("Employee not found.", { cause: 404 }));
+  }
+
+  const workingHours = [
+    "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
+    "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30",
+    "20:00"
+  ]
+  const schedule = employee.schedule.find((s) => s.date === date);
+  const bookedTimes = schedule ? schedule.times : [];
+
+  const availableTimes = workingHours.filter((time) => !bookedTimes.includes(time));
+
+  res.status(200).json({ status: "success", availableTimes });
+});

@@ -83,3 +83,37 @@ export const updateUserSchema = joi
   .messages({
     "object.base": "Input must be a valid object.",
   });
+
+  export const createAppoinmentSchema = joi
+  .object({
+    employeeId: generalFeilds.optionalId,
+
+    file: joi.object({
+      appoinmentAttachment: joi.array().items(generalFeilds.file).min(1).messages({
+        "array.length": "The appointment attachment must contain exactly one file.",
+        "array.min": "Appointment attachment can't be empty." 
+      }),
+    }),
+
+    appoinmentTitle: joi.string().required(),
+
+    appoinmentDate: joi.date().min("now").required(),
+
+    appoinmentTime: joi
+      .string()
+      .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+      .required()
+      .messages({
+        "string.pattern.base":
+          "Time must be in the format HH:MM (24-hour clock).",
+        "any.required": "Time is required.",
+      }),
+
+    reason: joi.string().required(),
+
+    notes: joi.string(),
+  })
+  .required()
+  .messages({
+    "object.base": "Input must be a valid object.",
+  });

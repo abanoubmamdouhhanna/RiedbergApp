@@ -68,6 +68,17 @@ const employeeSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+
+    schedule: [
+      {
+        date: String, // "YYYY-MM-DD"
+        times: [String], // Reserved times ["09:00", "10:30", ...]
+      },
+    ],
+
+
+
     isBlocked: {
       type: Boolean,
       default: false,

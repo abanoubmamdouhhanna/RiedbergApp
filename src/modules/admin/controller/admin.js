@@ -244,6 +244,33 @@ export const creatAnnouncement = asyncHandler(async (req, res, next) => {
   req.body.author = req.user.userName;
   req.body.createdBy = req.user._id;
   const announcement = await announcementModel.create(req.body);
+
+
+   // Notify all users and employees
+   try {
+
+    const io = req.app.get("io");
+    if (!io) throw new Error("Socket.IO instance not found");
+
+
+    const users = await userModel.find({}, "_id"); 
+    const employees = await employeeModel.find({}, "_id");
+
+    const recipientIds = [...users.map(user => user._id.toString()), ...employees.map(emp => emp._id.toString())];
+
+    if (io) {
+      recipientIds.forEach(recipientId => {
+        io.to(recipientId).emit("notification", {
+          title: announcement.announcementTitle,  
+          description: announcement.announcementDesc,
+          createdAt: new Date(),
+        });
+      });
+    }
+  } catch (error) {
+    return next(new Error("Failed to send notifications", { cause: 500 }));
+  }
+
   return res.status(201).json({
     status: "success",
     message: "Announcement created successfully",

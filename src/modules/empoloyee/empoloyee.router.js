@@ -4,7 +4,6 @@ import { auth } from "../../middlewares/auth.middleware.js";
 import { allowedTypesMap, fileUpload } from "../../utils/multerCloudinary.js";
 import { isValid } from "../../middlewares/validation.middleware.js";
 import {
-  createAppoinmentSchema,
   createEmployeeSchema,
   createProblemSchema,
   deleteEmployeeSchema,
@@ -37,7 +36,7 @@ router.post(
   "/createProblem/:userId",
   isValid(headersSchema, true),
   auth("employee"),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "problemImage",
       maxCount: 1,
@@ -45,21 +44,6 @@ router.post(
   ]),
   isValid(createProblemSchema),
   employeeController.createProblem
-);
-
-//create appoinment
-router.post(
-  "/createAppoinment",
-  isValid(headersSchema, true),
-  auth("employee"),
-  fileUpload(2,allowedTypesMap).fields([
-    {
-      name: "appoinmentAttachment",
-      maxCount: 1,
-    },
-  ]),
-  isValid(createAppoinmentSchema),
-  employeeController.createAppoinment
 );
 
 //get appoitment
@@ -79,4 +63,11 @@ router.get(
   employeeController.profile
 );
 
+//Fetch Available Times 
+router.get(
+  "/getAvailableTimes/:employeeId/:date",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin", "user", "employee"]),
+  employeeController.getAvailableTimes
+);
 export default router;
