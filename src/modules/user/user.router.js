@@ -22,7 +22,7 @@ router.post(
   userController.createUser
 );
 
-//update user
+//update user maintenanceDay
 router.patch(
   "/updateUser",
   isValid(headersSchema, true),
@@ -53,6 +53,22 @@ router.post(
   ]),
   isValid(createAppoinmentSchema),
   userController.createAppoinment
+);
+
+//get all users profiles
+router.get(
+  "/usersProfiles",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  userController.usersProfiles
+);
+
+// all user Ids
+router.get(
+  "/usersIds",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  userController.usersIds
 );
 
 export default router;

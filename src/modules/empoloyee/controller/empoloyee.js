@@ -111,7 +111,18 @@ export const profile=asyncHandler(async(req,res,next)=>
     result: employeesProfiles,
   });
 })
+//====================================================================================================================//
+// all employee Ids
 
+export const employeeIds=asyncHandler(async(req,res,next)=>
+  {
+    const employeesIds=await employeeModel.find().select("_id")
+    return res.status(200).json({
+      status: "success",
+      message: "Done!",
+      result: employeesIds,
+    });
+  })
 //====================================================================================================================//
 //Fetch Available Times 
 

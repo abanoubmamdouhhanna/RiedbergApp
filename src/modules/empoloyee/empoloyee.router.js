@@ -63,6 +63,14 @@ router.get(
   employeeController.profile
 );
 
+// all employee Ids
+router.get(
+  "/employeeIds",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  employeeController.employeeIds
+);
+
 //Fetch Available Times 
 router.get(
   "/getAvailableTimes/:employeeId/:date",

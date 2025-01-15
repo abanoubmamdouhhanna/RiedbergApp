@@ -48,7 +48,7 @@ export const createUser = asyncHandler(async (req, res, next) => {
 });
 
 //====================================================================================================================//
-//update user
+//update user maintenanceDay
 export const updateUser = asyncHandler(async (req, res, next) => {
   const { maintenanceDay } = req.body;
   if (maintenanceDay) {
@@ -182,3 +182,29 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
     result: appoinment,
   });
 });
+
+//====================================================================================================================//
+//get all users profiles
+
+export const usersProfiles=asyncHandler(async(req,res,next)=>
+  {
+    const usersProfiles=await userModel.find()
+    return res.status(200).json({
+      status: "success",
+      message: "Done!",
+      result: usersProfiles
+    });
+  })
+
+  //====================================================================================================================//
+// all employee Ids
+
+export const usersIds=asyncHandler(async(req,res,next)=>
+  {
+    const usersIds=await userModel.find().select("_id")
+    return res.status(200).json({
+      status: "success",
+      message: "Done!",
+      result: usersIds,
+    });
+  })
