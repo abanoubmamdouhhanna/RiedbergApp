@@ -1,6 +1,4 @@
 import multer from "multer";
-import { fileTypeFromBuffer } from "file-type";
-import fs from "fs";
 import { asyncHandler } from "./errorHandling.js";
 import { dangerousExtensions } from "./dangerousExtensions.js";
 
@@ -32,17 +30,6 @@ const fileValidation = (allowedTypesMap = {}) => {
     }
 
     cb(null, true);
-
-    req.on("end", async () => {
-      if (!file.path) return;
-
-      const buffer = fs.readFileSync(file.path);
-      const type = await fileTypeFromBuffer(buffer);
-      if (!type || !allowedMimeTypes.includes(type.mime)) {
-        fs.unlinkSync(file.path);
-        return new Error("Invalid file type based on content", { cause: 400 });
-      }
-    });
   });
 };
 

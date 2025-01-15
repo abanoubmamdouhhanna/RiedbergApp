@@ -81,10 +81,9 @@ export const isValid = (joiSchema, considerHeaders = false) => {
 
     const { error } = joiSchema.validate(copyReq, { abortEarly: false });
     if (error) {
-      // return next(new Error(error));
       return res
         .status(422)
-        .json({ message: "Validation Error", Error: error.message });
+        .json({ message: "Validation Error",status_code: 422, Error: error.message });
     } else {
       return next();
     }

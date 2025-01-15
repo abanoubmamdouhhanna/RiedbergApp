@@ -15,7 +15,7 @@ const initApp = (app, express) => {
   app.use("/user", userRouter);
 
   app.all("*", (req, res, next) => {
-    return res.status(404).json({ message: "error 404 in-valid routing" });
+    return next(new Error("error 404 in-valid routing",{cause:404}))
   });
 
   app.use(glopalErrHandling);

@@ -45,7 +45,7 @@ router.post(
   "/createAppoinment/:employeeId",
   isValid(headersSchema, true),
   auth("user"),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "appoinmentAttachment",
       maxCount: 1,
@@ -54,6 +54,5 @@ router.post(
   isValid(createAppoinmentSchema),
   userController.createAppoinment
 );
-
 
 export default router;

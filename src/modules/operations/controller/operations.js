@@ -37,13 +37,11 @@ export const profile = asyncHandler(async (req, res, next) => {
       new Error(`${req.user.role} profile not found`, { cause: 404 })
     );
   }
-  return res
-    .status(200)
-    .json({
-      status: "Success",
-      message: `${req.user.role} profile`,
-      result: profile,
-    });
+  return res.status(200).json({
+    status: "Success",
+    message: `${req.user.role} profile`,
+    result: profile,
+  });
 });
 
 //====================================================================================================================//
@@ -189,7 +187,7 @@ export const getPosts = async (req, res, next) => {
     .find()
     .populate({
       path: "comments",
-      populate: populateReplies(100), //Maximum call stack size :2379
+      populate: populateReplies(100),
     })
     .populate({
       path: "createdBy",
@@ -221,14 +219,10 @@ const populateUserReplies = (depth) => {
 };
 
 export const getUserPosts = async (req, res, next) => {
-
-   
-  const posts = await postModel
-    .find({createdBy:req.user._id})
-    .populate({
-      path: "comments",
-      populate: populateReplies(100), //Maximum call stack size :2379
-    })
+  const posts = await postModel.find({ createdBy: req.user._id }).populate({
+    path: "comments",
+    populate: populateReplies(100), //Maximum call stack size :2379
+  });
 
   return res.status(200).json({ message: "All posts", result: posts });
 };
