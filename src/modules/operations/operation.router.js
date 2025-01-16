@@ -189,4 +189,12 @@ router.get(
   operationController.getMaintenance
 );
 
+// all all Ids
+router.get(
+  "/allIds",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  operationController.allIds
+);
+
 export default router;

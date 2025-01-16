@@ -423,3 +423,20 @@ export const getMaintenance = asyncHandler(async (req, res, next) => {
     result: maintenance,
   });
 });
+//====================================================================================================================//
+// all Ids
+
+export const allIds=asyncHandler(async(req,res,next)=>
+  {
+    const usersIds=await userModel.find().select("_id").lean();
+    const employeesIds=await employeeModel.find().select("_id").lean();
+    const Ids = [
+      ...usersIds.map(user => user._id),
+      ...employeesIds.map(employee => employee._id)
+  ];
+    return res.status(200).json({
+      status: "success",
+      message: "Done!",
+      allIds: Ids
+    });
+  })
