@@ -3,6 +3,45 @@ import { generalFeilds } from "../../../middlewares/validation.middleware.js";
 
 export const headersSchema = generalFeilds.headers;
 
+export const updateAdminSchema =joi.object({
+  
+  adminId: generalFeilds.id,
+
+  userName: generalFeilds.userName,
+
+  email: generalFeilds.email,
+
+  phone: generalFeilds.phone,
+  oldPassword: generalFeilds.password,
+
+  newPassword: generalFeilds.password
+    .disallow(joi.ref("oldPassword"))
+    .messages({
+      "any.invalid": "New Password cannot be the same as Old Password.",
+    }),
+
+}).required() .messages({
+    "object.base": "Input must be a valid object.",
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const deleteAdminSchema = joi
   .object({
     adminId: generalFeilds.id,
@@ -85,9 +124,10 @@ export const creatAnnouncementSchema = joi
 
     Priority: joi.string().valid("Normal", "High"),
 
-    type:joi.string()
-    .valid("Information", "Event", "Maintenance")
-    .default("Information")
+    type: joi
+      .string()
+      .valid("Information", "Event", "Maintenance")
+      .default("Information"),
   })
   .required()
   .messages({
@@ -96,7 +136,7 @@ export const creatAnnouncementSchema = joi
 
 export const updateAnnouncementSchema = joi
   .object({
-    announcementId:generalFeilds.id,
+    announcementId: generalFeilds.id,
     file: joi.object({
       announcementAttach: joi.array().items(generalFeilds.file).length(1),
     }),
@@ -132,18 +172,14 @@ export const updateFamilySchema = joi
         "number.base": "Number of apartments must be a number.",
         "number.min": "Number of apartments must be at least 1.",
       }),
-
-    familyMembers: joi
-      .object()
-      .pattern(
-        joi.string().valid("father", "mother", "son", "daughter"), // Only specific keys are allowed
-        joi.number().integer().min(0) // Values must be non-negative integers
-      )
-
+    memberType: joi
+      .string()
+      .valid("father", "mother", "son", "daughter")
+      .default("father")
       .messages({
-        "object.base": "Family members must be an object.",
-        "object.pattern.match":
-          "Keys must be one of 'father', 'mother', 'son', or 'daughter', and values must be non-negative numbers.",
+        "any.only":
+          "Member type must be one of 'father', 'mother', 'son', or 'daughter'.",
+        "string.base": "Member type must be a string.",
       }),
   })
   .required()

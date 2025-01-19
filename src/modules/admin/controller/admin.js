@@ -11,6 +11,81 @@ import announcementModel from "../../../../DB/models/Announcements.model.js";
 import { compare, Hash } from "../../../utils/Hash&Compare.js";
 import { Server } from "socket.io";
 
+//update admin
+export const updateAdmin =asyncHandler(async(req,res,next)=>
+{
+  const { userName, email,  oldPassword, newPassword, phone } = req.body;
+  const {adminId}=req.params
+  const admin =await adminModel.findById(adminId)
+  if (!admin) {
+    return next(new Error("Admin not found", { cause: 404 }));
+  }
+  if (!(userName || email || phone || ( oldPassword && newPassword) )) {
+    return next(new Error("We need information to update", { cause: 400 }));
+  }
+if ((userName || email || phone )) {
+  const object = { ...req.body };
+  for (let key in object) {
+    if (admin[key] == object[key]) {
+      return next(
+        new Error(
+          `Cannot update ${key} with the same value. Please provide a different value.`,
+          { cause: 400 }
+        )
+      );
+    }
+  }
+}
+if (userName && (await adminModel.findOne({ userName }))) {
+  return next(
+    new Error("The username you have chosen is already taken.", { cause: 409 })
+  );
+}
+if (admin.isDeleted) {
+  return next(
+    new Error(
+      "Cannot update user information because the account is suspended or deleted.",
+      { cause: 403 }
+    )
+  );
+
+}
+const matchOld = compare({
+  plainText: oldPassword,
+  hashValue: admin.password,
+});
+if (!matchOld) {
+  return next(new Error("In-valid password", { cause: 400 }));
+}
+const checkMatchNew = compare({
+  plainText: newPassword,
+  hashValue: admin.password,
+});
+if (checkMatchNew) {
+  return next(
+    new Error("New password can't be old password", { cause: 400 })
+  );
+}
+const hashPassword = Hash({ plainText: newPassword });
+req.body.password=hashPassword
+req.body.changeAccountInfo= Date.now() 
+
+  // Update the user in the database
+  const updateAdmin = await adminModel.findByIdAndUpdate(
+    { _id: adminId },
+    req.body,
+    { new: true }
+  );
+
+  return res.status(200).json({
+    status: "success",
+    message: "Admin updated successfully.",
+    result: updateAdmin
+  });
+
+
+})
+//====================================================================================================================//
 //delete admin
 
 export const deleteAdmin = asyncHandler(async (req, res, next) => {
@@ -104,7 +179,7 @@ export const updateGallery = asyncHandler(async (req, res, next) => {
               imageDate: new Date().toISOString().split("T")[0],
             }))
             .catch(() => {
-              throw new Error("Failed to upload image",{ cause: 500 }); // Error handling per image upload failure
+              throw new Error("Failed to upload image", { cause: 500 }); // Error handling per image upload failure
             })
         )
       );
@@ -207,14 +282,14 @@ export const createNotification = asyncHandler(async (req, res, next) => {
     [`${recipientType}Id`]: recipient._id,
     receieverType: recipient.role,
   });
-    const io = req.app.get("io"); 
-    if (io) {
-      io.to(recipientId).emit("notification", {
-        title: notifyTitle,
-        description: notifyDescription,
-        createdAt: new Date(),
-      });
-    }
+  const io = req.app.get("io");
+  if (io) {
+    io.to(recipientId).emit("notification", {
+      title: notifyTitle,
+      description: notifyDescription,
+      createdAt: new Date(),
+    });
+  }
   return res.status(200).json({
     status: "success",
     message: "Notification created",
@@ -245,23 +320,23 @@ export const creatAnnouncement = asyncHandler(async (req, res, next) => {
   req.body.createdBy = req.user._id;
   const announcement = await announcementModel.create(req.body);
 
-
-   // Notify all users and employees
-   try {
-
+  // Notify all users and employees
+  try {
     const io = req.app.get("io");
     if (!io) throw new Error("Socket.IO instance not found");
 
-
-    const users = await userModel.find({}, "_id"); 
+    const users = await userModel.find({}, "_id");
     const employees = await employeeModel.find({}, "_id");
 
-    const recipientIds = [...users.map(user => user._id.toString()), ...employees.map(emp => emp._id.toString())];
+    const recipientIds = [
+      ...users.map((user) => user._id.toString()),
+      ...employees.map((emp) => emp._id.toString()),
+    ];
 
     if (io) {
-      recipientIds.forEach(recipientId => {
+      recipientIds.forEach((recipientId) => {
         io.to(recipientId).emit("notification", {
-          title: announcement.announcementTitle,  
+          title: announcement.announcementTitle,
           description: announcement.announcementDesc,
           createdAt: new Date(),
         });
@@ -307,7 +382,9 @@ export const updateAnnouncement = asyncHandler(async (req, res, next) => {
     { new: true }
   );
   if (!announcement) {
-    return next(new Error("Announcement not found or failed to update", { cause: 404 }));
+    return next(
+      new Error("Announcement not found or failed to update", { cause: 404 })
+    );
   }
   return res.status(200).json({
     status: "success",
@@ -319,9 +396,21 @@ export const updateAnnouncement = asyncHandler(async (req, res, next) => {
 //update user
 
 export const updateFamily = asyncHandler(async (req, res, next) => {
-  const { userName, email, phone, noOfAppartment, familyMembers } = req.body;
-  if (!(userName || email || phone || noOfAppartment || familyMembers)) {
+  const { userName, email, phone, noOfAppartment, memberType } = req.body;
+  if (!(userName || email || phone || noOfAppartment || memberType)) {
     return next(new Error("We need information to update", { cause: 400 }));
+  }
+  // Validate memberType
+  if (memberType) {
+    const allowedMemberTypes = ["father", "mother", "son", "daughter"];
+    if (!allowedMemberTypes.includes(memberType)) {
+      return next(
+        new Error(
+          "Invalid member type. Must be one of 'father', 'mother', 'son', 'daughter'.",
+          { cause: 400 }
+        )
+      );
+    }
   }
 
   const checkUser = await userModel.findById(req.params.userId);
@@ -334,7 +423,7 @@ export const updateFamily = asyncHandler(async (req, res, next) => {
     if (checkUser[key] == object[key]) {
       return next(
         new Error(
-          `I'm sorry, but we cannot update your ${key} with your old one. Please make sure that ${key} you have entered correctly and try again.`,
+          `Cannot update ${key} with the same value. Please provide a different value.`,
           { cause: 400 }
         )
       );
@@ -357,6 +446,80 @@ export const updateFamily = asyncHandler(async (req, res, next) => {
         { cause: 403 }
       )
     );
+  }
+  // Validate rules for memberType changes
+  const currentApartment = checkUser.noOfAppartment;
+  const newApartment = noOfAppartment || currentApartment;
+
+  const family = await userModel.find({ noOfAppartment: newApartment }); // Find all users in the same family (apartment)
+  const familyCounts = family.reduce(
+    (counts, member) => {
+      counts[member.memberType] = (counts[member.memberType] || 0) + 1;
+      return counts;
+    },
+    { father: 0, mother: 0, son: 0, daughter: 0 }
+  );
+
+  if (memberType) {
+    if (memberType === "father" && familyCounts.father >= 1) {
+      return next(
+        new Error("A family can have only one father.", { cause: 400 })
+      );
+    }
+
+    if (memberType === "mother" && familyCounts.mother >= 1) {
+      return next(
+        new Error("A family can have only one mother.", { cause: 400 })
+      );
+    }
+
+    if (memberType === "son" && familyCounts.son >= 3) {
+      return next(
+        new Error("A family can have a maximum of 3 sons.", { cause: 400 })
+      );
+    }
+
+    if (memberType === "daughter" && familyCounts.daughter >= 3) {
+      return next(
+        new Error("A family can have a maximum of 3 daughters.", { cause: 400 })
+      );
+    }
+  }
+
+  // Validate if moving to a new apartment violates rules
+  if (noOfAppartment && noOfAppartment !== currentApartment) {
+    if (checkUser.memberType === "father" && familyCounts.father >= 1) {
+      return next(
+        new Error(
+          "Cannot move to the new apartment because it already has a father.",
+          { cause: 400 }
+        )
+      );
+    }
+    if (checkUser.memberType === "mother" && familyCounts.mother >= 1) {
+      return next(
+        new Error(
+          "Cannot move to the new apartment because it already has a mother.",
+          { cause: 400 }
+        )
+      );
+    }
+    if (checkUser.memberType === "son" && familyCounts.son >= 3) {
+      return next(
+        new Error(
+          "Cannot move to the new apartment because it already has 3 sons.",
+          { cause: 400 }
+        )
+      );
+    }
+    if (checkUser.memberType === "daughter" && familyCounts.daughter >= 3) {
+      return next(
+        new Error(
+          "Cannot move to the new apartment because it already has 3 daughters.",
+          { cause: 400 }
+        )
+      );
+    }
   }
   const user = await userModel.findByIdAndUpdate(
     { _id: req.params.userId },
@@ -398,9 +561,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
   const user = await userModel
     .findByIdAndUpdate(
       { _id: userId },
-      { password: hashPassword,
-        changeAccountInfo:Date.now()
-       },
+      { password: hashPassword, changeAccountInfo: Date.now() },
       { new: true }
     )
     .select("userName email updatedAt");
@@ -410,4 +571,3 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
     result: user,
   });
 });
-

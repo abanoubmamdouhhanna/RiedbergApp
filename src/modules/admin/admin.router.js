@@ -11,11 +11,20 @@ import {
   createNotificationSchema,
   deleteAdminSchema,
   headersSchema,
+  updateAdminSchema,
   updateAnnouncementSchema,
   updateFamilySchema,
   updatePasswordSchema,
 } from "./controller/admin.validation.js";
 const router = Router();
+
+//update admin
+router.patch("/updateAdmin/:adminId",
+  isValid(headersSchema, true),
+  auth("superAdmin"),
+  isValid(updateAdminSchema),
+  adminController.updateAdmin)
+
 
 //delete admin
 router.delete(

@@ -10,8 +10,15 @@ import { nanoid } from "nanoid";
 //create user or family
 
 export const createUser = asyncHandler(async (req, res, next) => {
-  const { userName, email, password, phone, noOfAppartment, familyMembers } =
+  const { userName, email, password, phone, noOfAppartment ,memberType} =
     req.body;
+
+    
+  // Validate memberType
+  const allowedMemberTypes = ["father", "mother", "son", "daughter"];
+  if (!allowedMemberTypes.includes(memberType)) {
+    return next(new Error("Invalid member type. Must be one of 'father', 'mother', 'son', 'daughter'.", { cause: 400 }));
+  }
 
   // Run the email and username existence checks in parallel
   const [existedUser, checkExistUserName] = await Promise.all([
@@ -26,11 +33,34 @@ export const createUser = asyncHandler(async (req, res, next) => {
   if (checkExistUserName) {
     return next(new Error("Username already exists", { cause: 409 }));
   }
+  const family = await userModel.find({ noOfAppartment }); // Find all users in the same family (apartment)
+  const familyCounts = family.reduce(
+    (counts, member) => {
+      counts[member.memberType] = (counts[member.memberType] || 0) + 1;
+      return counts;
+    },
+    { father: 0, mother: 0, son: 0, daughter: 0 }
+  );
+
+  if (memberType === "father" && familyCounts.father >= 1) {
+    return next(new Error("A family can have only one father.", { cause: 400 }));
+  }
+
+  if (memberType === "mother" && familyCounts.mother >= 1) {
+    return next(new Error("A family can have only one mother.", { cause: 400 }));
+  }
+
+  if (memberType === "son" && familyCounts.son >= 3) {
+    return next(new Error("A family can have a maximum of 3 sons.", { cause: 400 }));
+  }
+
+  if (memberType === "daughter" && familyCounts.daughter >= 3) {
+    return next(new Error("A family can have a maximum of 3 daughters.", { cause: 400 }));
+  }
 
   // Hash password
   const hashPassword = Hash({ plainText: password });
 
-  const finalFamilyMembers = familyMembers || undefined;
 
   // Create the user in the database
   const createUser = await userModel.create({
@@ -39,7 +69,7 @@ export const createUser = asyncHandler(async (req, res, next) => {
     password: hashPassword,
     phone,
     noOfAppartment,
-    familyMembers: finalFamilyMembers,
+    memberType
   });
   return res.status(201).json({
     message: "user added successfully.",

@@ -24,17 +24,22 @@ const userSchema = new Schema(
       required: true,
     },
     noOfAppartment: {
-      type:Number,
-      required:true
+      type: Number,
+      required: true,
     },
     maintenanceDay: {
       type: String,
       default: new Date().toISOString().split("T")[0],
     },
-    familyMembers: {
-      type: Map,
-      of: Number,
-      default: { father: 1, mother: 1, son: 0, daughter: 0 },
+    // familyMembers: {
+    //   type: Map,
+    //   of: Number,
+    //   default: { father: 1, mother: 1, son: 0, daughter: 0 },
+    // },
+    memberType: { 
+      type: String, 
+      required: true, 
+      enum: ["father", "mother", "son", "daughter"] 
     },
     role: {
       type: String,
@@ -51,7 +56,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-  },    
+  },
   { timestamps: true }
 );
 

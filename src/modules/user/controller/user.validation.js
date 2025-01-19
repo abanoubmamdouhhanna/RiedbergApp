@@ -32,17 +32,14 @@ export const createUserSchema = joi
         "date.min": "Maintenance day must be today or in the future.",
       }),
 
-    familyMembers: joi
-      .object()
-      .pattern(
-        joi.string().valid("father", "mother", "son", "daughter"), // Only specific keys are allowed
-        joi.number().integer().min(0) // Values must be non-negative integers
-      )
-      .required()
+    memberType: joi
+      .string()
+      .valid("father", "mother", "son", "daughter")
+      .default("father")
       .messages({
-        "object.base": "Family members must be an object.",
-        "object.pattern.match":
-          "Keys must be one of 'father', 'mother', 'son', or 'daughter', and values must be non-negative numbers.",
+        "any.only":
+          "Member type must be one of 'father', 'mother', 'son', or 'daughter'.",
+        "string.base": "Member type must be a string.",
       }),
 
     role: joi
