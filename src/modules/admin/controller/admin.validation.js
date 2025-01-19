@@ -27,21 +27,6 @@ export const updateAdminSchema =joi.object({
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const deleteAdminSchema = joi
   .object({
     adminId: generalFeilds.id,

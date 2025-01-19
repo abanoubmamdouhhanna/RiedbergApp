@@ -36,11 +36,29 @@ if ((userName || email || phone )) {
     }
   }
 }
-if (userName && (await adminModel.findOne({ userName }))) {
-  return next(
-    new Error("The username you have chosen is already taken.", { cause: 409 })
-  );
+if (userName || email) {
+  const existingUser = await employeeModel.findOne({
+    $or: [{ userName }, { email }],
+  });
+
+  if (existingUser) {
+    if (existingUser.userName === userName) {
+      return next(
+        new Error("The username you have chosen is already taken.", {
+          cause: 409,
+        })
+      );
+    }
+    if (existingUser.email === email) {
+      return next(
+        new Error("The email you have entered is already in use.", {
+          cause: 409,
+        })
+      );
+    }
+  }
 }
+
 if (admin.isDeleted) {
   return next(
     new Error(
@@ -50,27 +68,29 @@ if (admin.isDeleted) {
   );
 
 }
-const matchOld = compare({
-  plainText: oldPassword,
-  hashValue: admin.password,
-});
-if (!matchOld) {
-  return next(new Error("In-valid password", { cause: 400 }));
+if (oldPassword && newPassword) {
+  const matchOld = compare({
+    plainText: oldPassword,
+    hashValue: admin.password,
+  });
+  if (!matchOld) {
+    return next(new Error("In-valid password", { cause: 400 }));
+  }
+  const checkMatchNew = compare({
+    plainText: newPassword,
+    hashValue: admin.password,
+  });
+  if (checkMatchNew) {
+    return next(
+      new Error("New password can't be old password", { cause: 400 })
+    );
+  }
+  const hashPassword = Hash({ plainText: newPassword });
+  req.body.password=hashPassword
+  req.body.changeAccountInfo= Date.now() 
 }
-const checkMatchNew = compare({
-  plainText: newPassword,
-  hashValue: admin.password,
-});
-if (checkMatchNew) {
-  return next(
-    new Error("New password can't be old password", { cause: 400 })
-  );
-}
-const hashPassword = Hash({ plainText: newPassword });
-req.body.password=hashPassword
-req.body.changeAccountInfo= Date.now() 
 
-  // Update the user in the database
+  // Update the Admin in the database
   const updateAdmin = await adminModel.findByIdAndUpdate(
     { _id: adminId },
     req.body,
@@ -429,16 +449,29 @@ export const updateFamily = asyncHandler(async (req, res, next) => {
       );
     }
   }
-  if (userName) {
-    if (await userModel.findOne({ userName })) {
-      return next(
-        new Error(
-          "I'm sorry, but the username you have chosen is already taken",
-          { cause: 409 }
-        )
-      );
+  if (userName || email) {
+    const existingUser = await employeeModel.findOne({
+      $or: [{ userName }, { email }],
+    });
+  
+    if (existingUser) {
+      if (existingUser.userName === userName) {
+        return next(
+          new Error("The username you have chosen is already taken.", {
+            cause: 409,
+          })
+        );
+      }
+      if (existingUser.email === email) {
+        return next(
+          new Error("The email you have entered is already in use.", {
+            cause: 409,
+          })
+        );
+      }
     }
   }
+  
   if (checkUser.isDeleted == true) {
     return next(
       new Error(

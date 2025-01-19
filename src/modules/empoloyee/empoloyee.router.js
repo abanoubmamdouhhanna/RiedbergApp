@@ -9,6 +9,7 @@ import {
   deleteEmployeeSchema,
   getAppoitmentSchema,
   headersSchema,
+  updateEmployeeSchema,
 } from "./controller/empolyee.validation.js";
 
 const router = Router();
@@ -20,6 +21,15 @@ router.post(
   auth(["admin", "superAdmin"]),
   isValid(createEmployeeSchema),
   employeeController.createEmployee
+);
+
+//update employee
+router.patch(
+  "/updateEmployee/:employeeId",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  isValid(updateEmployeeSchema),
+  employeeController.updateEmployee
 );
 
 //delete employee
