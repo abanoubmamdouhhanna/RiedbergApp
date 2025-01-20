@@ -184,7 +184,6 @@ const populateReplies = (depth) => {
 };
 
 export const getPosts = async (req, res, next) => {
-
   const userId = req.user._id; // Get the logged-in user's ID
   const posts = await postModel
     .find()
@@ -200,14 +199,10 @@ export const getPosts = async (req, res, next) => {
   // Add `like` and `unliked` fields for the logged-in user
   const postsWithUserInteraction = posts.map((post) => {
     const isLiked = post.likes.some(
-      (like) =>
-        like.userId.toString() === userId.toString()
-     
+      (like) => like.userId.toString() === userId.toString()
     );
     const isUnliked = post.unlikes.some(
-      (unlike) =>
-        unlike.userId.toString() === userId.toString() 
-    
+      (unlike) => unlike.userId.toString() === userId.toString()
     );
 
     return {
@@ -220,9 +215,7 @@ export const getPosts = async (req, res, next) => {
   return res
     .status(200)
     .json({ message: "All posts", result: postsWithUserInteraction });
-
 };
-
 
 //====================================================================================================================//
 //get user posts
@@ -252,28 +245,25 @@ export const getUserPosts = async (req, res, next) => {
     path: "comments",
     populate: populateReplies(100), //Maximum call stack size :2379
   });
-    // Add `like` and `unliked` fields for the logged-in user
-    const postsWithUserInteraction = posts.map((post) => {
-      const isLiked = post.likes.some(
-        (like) =>
-          like.userId.toString() === userId.toString()
-       
-      );
-      const isUnliked = post.unlikes.some(
-        (unlike) =>
-          unlike.userId.toString() === userId.toString() 
-      
-      );
-  
-      return {
-        ...post.toObject(), // Convert the post document to a plain object
-        like: isLiked,
-        unliked: isUnliked,
-      };
-    });
-  
+  // Add `like` and `unliked` fields for the logged-in user
+  const postsWithUserInteraction = posts.map((post) => {
+    const isLiked = post.likes.some(
+      (like) => like.userId.toString() === userId.toString()
+    );
+    const isUnliked = post.unlikes.some(
+      (unlike) => unlike.userId.toString() === userId.toString()
+    );
 
-  return res.status(200).json({ message: "All posts", result: postsWithUserInteraction });
+    return {
+      ...post.toObject(), // Convert the post document to a plain object
+      like: isLiked,
+      unliked: isUnliked,
+    };
+  });
+
+  return res
+    .status(200)
+    .json({ message: "All posts", result: postsWithUserInteraction });
 };
 //====================================================================================================================//
 //add comment
@@ -327,30 +317,36 @@ export let createReplyComment = asyncHandler(async (req, res, next) => {
 
 export let addlike = asyncHandler(async (req, res, next) => {
   let { commentId } = req.params;
-  let userRole;
-  if (req.user.role == "superAdmin") {
-    userRole = "Admin";
+  const userId = req.user._id;
+  const userRole = req.user.role === "superAdmin" ? "Admin" : req.user.role;
+
+  const comment = await commentModel.findById(commentId);
+  if (!comment) {
+    return next(new Error("Comment not found", { cause: 404 }));
   }
-  let comment = await commentModel.findOneAndUpdate(
+
+  let updatedComment = await commentModel.findByIdAndUpdate(
     { _id: commentId },
     {
-      $addToSet: { likes: { userId: req.user._id, userType: userRole } },
-      $pull: { unlikes: { userId: req.user._id } },
+      $addToSet: { likes: { userId, userType: userRole } },
+      $pull: { unlikes: { userId } },
     },
     { new: true }
   );
-  return res.status(201).json({ message: "liked", comment });
+  return res.status(201).json({ message: "liked", updatedComment });
 });
 //====================================================================================================================//
 //add comment unLike
 
 export let addUnLike = asyncHandler(async (req, res, next) => {
   let { commentId } = req.params;
-  let userRole;
-  if (req.user.role == "superAdmin") {
-    userRole = "Admin";
+  const userRole = req.user.role === "superAdmin" ? "Admin" : req.user.role;
+
+  const comment = await commentModel.findById(commentId);
+  if (!comment) {
+    return next(new Error("Comment not found", { cause: 404 }));
   }
-  let comment = await commentModel.findOneAndUpdate(
+  let updatedComment = await commentModel.findOneAndUpdate(
     { _id: commentId },
     {
       $addToSet: { unlikes: { userId: req.user._id, userType: userRole } },
@@ -358,45 +354,59 @@ export let addUnLike = asyncHandler(async (req, res, next) => {
     },
     { new: true }
   );
-  return res.status(201).json({ message: "un liked", comment });
+  return res.status(201).json({ message: "un liked", updatedComment });
 });
 //====================================================================================================================//
 //add post like
 
 export let addPostLike = asyncHandler(async (req, res, next) => {
-  let { postId } = req.params;
-  let userRole;
-  if (req.user.role == "superAdmin") {
-    userRole = "Admin";
+  const { postId } = req.params;
+  const userId = req.user._id;
+  const userRole = req.user.role === "superAdmin" ? "Admin" : req.user.role;
+
+  // Find the post
+  const post = await postModel.findById(postId);
+  if (!post) {
+    return next(new Error("Post not found", { cause: 404 }));
   }
-  let post = await postModel.findOneAndUpdate(
-    { _id: postId },
+  const updatedPost = await postModel.findByIdAndUpdate(
+    postId,
     {
-      $addToSet: { likes: { userId: req.user._id, userType: userRole } },
-      $pull: { unlikes: { userId: req.user._id } },
+      $addToSet: { likes: { userId, userType: userRole } },
+      $pull: { unlikes: { userId } },
     },
     { new: true }
   );
-  return res.status(201).json({ message: "liked", post });
+
+  return res.status(201).json({
+    status: "success",
+    message: "Post liked successfully.",
+    updatedPost,
+  });
 });
+
 //====================================================================================================================//
 //add post unLike
 
 export let addPostUnLike = asyncHandler(async (req, res, next) => {
   let { postId } = req.params;
-  let userRole;
-  if (req.user.role == "superAdmin") {
-    userRole = "Admin";
+  const userId = req.user._id;
+  const userRole = req.user.role === "superAdmin" ? "Admin" : req.user.role;
+
+  // Find the post
+  const post = await postModel.findById(postId);
+  if (!post) {
+    return next(new Error("Post not found", { cause: 404 }));
   }
-  let post = await postModel.findOneAndUpdate(
+  let updatedPost = await postModel.findOneAndUpdate(
     { _id: postId },
     {
-      $addToSet: { unlikes: { userId: req.user._id, userType: userRole } },
-      $pull: { likes: { userId: req.user._id } },
+      $addToSet: { unlikes: { userId: userId, userType: userRole } },
+      $pull: { likes: { userId: userId } },
     },
     { new: true }
   );
-  return res.status(201).json({ message: "un liked", post });
+  return res.status(201).json({ message: "un liked", updatedPost });
 });
 
 //====================================================================================================================//
@@ -475,47 +485,43 @@ export const getMaintenance = asyncHandler(async (req, res, next) => {
 //====================================================================================================================//
 // all Ids
 
-export const allIds=asyncHandler(async(req,res,next)=>
-  {
-    const usersIds=await userModel.find().select("_id").lean();
-    const employeesIds=await employeeModel.find().select("_id").lean();
-    const Ids = [
-      ...usersIds.map(user => user._id),
-      ...employeesIds.map(employee => employee._id)
+export const allIds = asyncHandler(async (req, res, next) => {
+  const usersIds = await userModel.find().select("_id").lean();
+  const employeesIds = await employeeModel.find().select("_id").lean();
+  const Ids = [
+    ...usersIds.map((user) => user._id),
+    ...employeesIds.map((employee) => employee._id),
   ];
-    return res.status(200).json({
-      status: "success",
-      message: "Done!",
-      allIds: Ids
-    });
-  })
-  //====================================================================================================================//
+  return res.status(200).json({
+    status: "success",
+    message: "Done!",
+    allIds: Ids,
+  });
+});
+//====================================================================================================================//
 //get announcement
-export const getAnnouncement =asyncHandler(async(req,res,next)=>
-  {
-    const {announcementId}=req.params
-    const announcement=await announcementModel.findById(announcementId)
-    if (!announcement) {
-      return next(new Error("Announcement not found", { cause: 404 }));
-    }
-    return res.status(200).json({
-      status: "success",
-      message: "Done",
-      result: announcement,
-    });
-  })
-  
-  //====================================================================================================================//
-  //get all announcements
+export const getAnnouncement = asyncHandler(async (req, res, next) => {
+  const { announcementId } = req.params;
+  const announcement = await announcementModel.findById(announcementId);
+  if (!announcement) {
+    return next(new Error("Announcement not found", { cause: 404 }));
+  }
+  return res.status(200).json({
+    status: "success",
+    message: "Done",
+    result: announcement,
+  });
+});
 
-  export const getAllAnnouncement =asyncHandler(async(req,res,next)=>
-  {
-    const announcement=await announcementModel.find()
-      return res.status(200).json({
-      status: "success",
-      message: "Done",
-      count:announcement.length,
-      result: announcement,
-    });
-  })
-  
+//====================================================================================================================//
+//get all announcements
+
+export const getAllAnnouncement = asyncHandler(async (req, res, next) => {
+  const announcement = await announcementModel.find();
+  return res.status(200).json({
+    status: "success",
+    message: "Done",
+    count: announcement.length,
+    result: announcement,
+  });
+});

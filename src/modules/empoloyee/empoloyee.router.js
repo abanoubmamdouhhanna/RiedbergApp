@@ -60,7 +60,7 @@ router.post(
 router.get(
   "/getAppoitment/:appoinmentId",
   isValid(headersSchema, true),
-  auth("employee"),
+  auth(["admin", "superAdmin", "employee", "user"]),
   isValid(getAppoitmentSchema),
   employeeController.getAppoitment
 );

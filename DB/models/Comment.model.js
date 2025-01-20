@@ -1,5 +1,17 @@
 import mongoose, { model, Schema, Types } from "mongoose";
 
+const reactionSchema = new Schema(
+  {
+    userId: { type: Types.ObjectId, required: true }, // Reference to the user
+    userType: {
+      type: String,
+      enum: ["user", "admin", "employee"],
+      required: true,
+    }, // Role of the user
+  },
+  { _id: false } // Prevent creation of a separate `_id` for each sub-document
+);
+
 const commentSchema = new Schema(
   {
     author: {
@@ -10,19 +22,9 @@ const commentSchema = new Schema(
       type: String,
       required: true,
     },
-    likes: [
-      {
-        userId: { type: Types.ObjectId, required: true }, // Reference to the user, admin, or employee ID
-        userType: { type: String, enum: ["User", "Admin", "Employee"], required: true }, // Role of the user
-      },
-    ],
-    unlikes: [
-      {
-        userId: { type: Types.ObjectId, required: true }, // Reference to the user, admin, or employee ID
-        userType: { type: String, enum: ["User", "Admin", "Employee"], required: true }, // Role of the user
-      },
-    ],
-    
+
+    likes: [reactionSchema], // Reference the reaction schema
+    unlikes: [reactionSchema], // Reference the reaction schema
 
     postId: { type: Types.ObjectId, ref: "Post", required: true },
     reply: [{ type: Types.ObjectId, ref: "Comment" }],
