@@ -3,12 +3,12 @@ import { asyncHandler } from "./errorHandling.js";
 import { dangerousExtensions } from "./dangerousExtensions.js";
 
 export const allowedTypesMap = {
-  galleryImages: ["image/png", "image/jpeg"],
-  postImage: ["image/png", "image/jpeg"],
-  maintenanceImage: ["image/png", "image/jpeg"],
-  problemImage: ["image/png", "image/jpeg"],
-  appoinmentAttachment: ["image/png", "image/jpeg", "application/pdf"],
-  announcementAttach: ["image/png", "image/jpeg", "application/pdf"],
+  galleryImages: ["image/png", "image/jpeg","image/gif","image/webp"],
+  postImage: ["image/png", "image/jpeg","image/gif","image/webp"],
+  maintenanceImage: ["image/png", "image/jpeg","image/gif","image/webp"],
+  problemImage: ["image/png", "image/jpeg","image/gif","image/webp"],
+  appoinmentAttachment: ["image/png", "image/jpeg", "application/pdf","image/gif","image/webp"],
+  announcementAttach: ["image/png", "image/jpeg", "application/pdf","image/gif","image/webp"],
 };
 
 const fileValidation = (allowedTypesMap = {}) => {
@@ -24,7 +24,7 @@ const fileValidation = (allowedTypesMap = {}) => {
     const allowedMimeTypes = allowedTypesMap[file.fieldname] || [];
     if (!allowedMimeTypes.includes(file.mimetype)) {
       return cb(
-        new Error(`Invalid MIME type for ${file.fieldname}`, { cause: 400 }),
+        new Error(`Invalid type for ${file.fieldname}`, { cause: 400 }),
         false
       );
     }
