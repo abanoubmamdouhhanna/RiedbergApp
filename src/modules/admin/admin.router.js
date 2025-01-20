@@ -10,6 +10,7 @@ import {
   creatAnnouncementSchema,
   createNotificationSchema,
   deleteAdminSchema,
+  deleteGallerySchema,
   headersSchema,
   updateAdminSchema,
   updateAnnouncementSchema,
@@ -70,8 +71,17 @@ router.patch(
     },
   ]),
   isValid(aupdateGallerySchema),
-  adminController.updateGallery
+  adminController.updateGallery,
+  
 );
+//delete gallery
+router.delete(
+  "/deleteGallery/:galleryId",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  isValid(deleteGallerySchema),
+  adminController.deleteGallery,
+)
 
 // change maintenance status
 router.patch(

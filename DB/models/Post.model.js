@@ -26,7 +26,7 @@ const postSchema = new Schema(
     authorType: { 
       type: String, 
       required: true, 
-      enum: ['User', 'Admin', 'Employee'] // Ensure it matches valid model types
+      enum: ['user', 'admin','superAdmin' ,'employee'] // Ensure it matches valid model types
     },
     postImage: String,
     comments: [{ type: Types.ObjectId, ref: "Comment" }],

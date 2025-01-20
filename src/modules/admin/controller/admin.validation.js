@@ -64,6 +64,15 @@ export const aupdateGallerySchema = joi
     "object.base": "Input must be a valid object.",
   });
 
+export const deleteGallerySchema = joi
+  .object({
+    galleryId: generalFeilds.id,
+  })
+  .required()
+  .messages({
+    "object.base": "Input must be a valid object.",
+  });
+
 export const changeStatusSchema = joi
   .object({
     maintenanceId: generalFeilds.id,

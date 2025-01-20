@@ -217,6 +217,32 @@ export const updateGallery = asyncHandler(async (req, res, next) => {
   });
 });
 //====================================================================================================================//
+//delete sp gallery
+
+export const deleteGallery=asyncHandler(async(req,res,next)=>
+{
+  const {galleryId}=req.params
+  const gallery = await galleryModel.findById(galleryId);
+  if (!gallery) {
+    return next(new Error("Gallery not found.", { cause: 404 }));
+    }
+    if (gallery.createdBy.toString() !== req.user._id.toString() && req.user.role !== "superAdmin") {
+      return next(new Error("You are not authorized to delete this gallery.", { cause: 401 }));
+    }
+  
+    const deletedGallery = await galleryModel.findByIdAndDelete(galleryId);
+    if (!deletedGallery) {
+      return next(new Error("Delete failed. Please try again.", { cause: 500 }));
+    }
+  
+    return res.status(200).json({
+      status: "success",
+      message: "Gallery deleted successfully.",
+      result: deletedGallery,
+    });
+
+})
+//====================================================================================================================//
 // change maintenance status
 
 export const changeStatus = asyncHandler(async (req, res, next) => {
