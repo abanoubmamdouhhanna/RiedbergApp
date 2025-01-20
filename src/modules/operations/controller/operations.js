@@ -184,7 +184,9 @@ const populateReplies = (depth) => {
 };
 
 export const getPosts = async (req, res, next) => {
-  const post = await postModel
+
+  const userId = req.user._id; // Get the logged-in user's ID
+  const posts = await postModel
     .find()
     .populate({
       path: "comments",
@@ -195,8 +197,32 @@ export const getPosts = async (req, res, next) => {
       select: "userName email phone",
     });
 
-  return res.status(200).json({ message: "All posts", result: post });
+  // Add `like` and `unliked` fields for the logged-in user
+  const postsWithUserInteraction = posts.map((post) => {
+    const isLiked = post.likes.some(
+      (like) =>
+        like.userId.toString() === userId.toString()
+     
+    );
+    const isUnliked = post.unlikes.some(
+      (unlike) =>
+        unlike.userId.toString() === userId.toString() 
+    
+    );
+
+    return {
+      ...post.toObject(), // Convert the post document to a plain object
+      like: isLiked,
+      unliked: isUnliked,
+    };
+  });
+
+  return res
+    .status(200)
+    .json({ message: "All posts", result: postsWithUserInteraction });
+
 };
+
 
 //====================================================================================================================//
 //get user posts
@@ -220,12 +246,34 @@ const populateUserReplies = (depth) => {
 };
 
 export const getUserPosts = async (req, res, next) => {
-  const posts = await postModel.find({ createdBy: req.user._id }).populate({
+  const userId = req.user._id; // Get the logged-in user's ID
+
+  const posts = await postModel.find({ createdBy: userId }).populate({
     path: "comments",
     populate: populateReplies(100), //Maximum call stack size :2379
   });
+    // Add `like` and `unliked` fields for the logged-in user
+    const postsWithUserInteraction = posts.map((post) => {
+      const isLiked = post.likes.some(
+        (like) =>
+          like.userId.toString() === userId.toString()
+       
+      );
+      const isUnliked = post.unlikes.some(
+        (unlike) =>
+          unlike.userId.toString() === userId.toString() 
+      
+      );
+  
+      return {
+        ...post.toObject(), // Convert the post document to a plain object
+        like: isLiked,
+        unliked: isUnliked,
+      };
+    });
+  
 
-  return res.status(200).json({ message: "All posts", result: posts });
+  return res.status(200).json({ message: "All posts", result: postsWithUserInteraction });
 };
 //====================================================================================================================//
 //add comment
