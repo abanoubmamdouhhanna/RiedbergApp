@@ -12,83 +12,81 @@ import { compare, Hash } from "../../../utils/Hash&Compare.js";
 import { Server } from "socket.io";
 
 //update admin
-export const updateAdmin =asyncHandler(async(req,res,next)=>
-{
-  const { userName, email,  oldPassword, newPassword, phone } = req.body;
-  const {adminId}=req.params
-  const admin =await adminModel.findById(adminId)
+export const updateAdmin = asyncHandler(async (req, res, next) => {
+  const { userName, email, oldPassword, newPassword, phone } = req.body;
+  const { adminId } = req.params;
+  const admin = await adminModel.findById(adminId);
   if (!admin) {
     return next(new Error("Admin not found", { cause: 404 }));
   }
-  if (!(userName || email || phone || ( oldPassword && newPassword) )) {
+  if (!(userName || email || phone || (oldPassword && newPassword))) {
     return next(new Error("We need information to update", { cause: 400 }));
   }
-if ((userName || email || phone )) {
-  const object = { ...req.body };
-  for (let key in object) {
-    if (admin[key] == object[key]) {
-      return next(
-        new Error(
-          `Cannot update ${key} with the same value. Please provide a different value.`,
-          { cause: 400 }
-        )
-      );
+  if (userName || email || phone) {
+    const object = { ...req.body };
+    for (let key in object) {
+      if (admin[key] == object[key]) {
+        return next(
+          new Error(
+            `Cannot update ${key} with the same value. Please provide a different value.`,
+            { cause: 400 }
+          )
+        );
+      }
     }
   }
-}
-if (userName || email) {
-  const existingUser = await employeeModel.findOne({
-    $or: [{ userName }, { email }],
-  });
+  if (userName || email) {
+    const existingUser = await employeeModel.findOne({
+      $or: [{ userName }, { email }],
+    });
 
-  if (existingUser) {
-    if (existingUser.userName === userName) {
-      return next(
-        new Error("The username you have chosen is already taken.", {
-          cause: 409,
-        })
-      );
-    }
-    if (existingUser.email === email) {
-      return next(
-        new Error("The email you have entered is already in use.", {
-          cause: 409,
-        })
-      );
+    if (existingUser) {
+      if (existingUser.userName === userName) {
+        return next(
+          new Error("The username you have chosen is already taken.", {
+            cause: 409,
+          })
+        );
+      }
+      if (existingUser.email === email) {
+        return next(
+          new Error("The email you have entered is already in use.", {
+            cause: 409,
+          })
+        );
+      }
     }
   }
-}
 
-if (admin.isDeleted) {
-  return next(
-    new Error(
-      "Cannot update user information because the account is suspended or deleted.",
-      { cause: 403 }
-    )
-  );
-
-}
-if (oldPassword && newPassword) {
-  const matchOld = compare({
-    plainText: oldPassword,
-    hashValue: admin.password,
-  });
-  if (!matchOld) {
-    return next(new Error("In-valid password", { cause: 400 }));
-  }
-  const checkMatchNew = compare({
-    plainText: newPassword,
-    hashValue: admin.password,
-  });
-  if (checkMatchNew) {
+  if (admin.isDeleted) {
     return next(
-      new Error("New password can't be old password", { cause: 400 })
+      new Error(
+        "Cannot update user information because the account is suspended or deleted.",
+        { cause: 403 }
+      )
     );
   }
-  const hashPassword = Hash({ plainText: newPassword });
-  req.body.password=hashPassword
-  req.body.changeAccountInfo= Date.now() 
-}
+  if (oldPassword && newPassword) {
+    const matchOld = compare({
+      plainText: oldPassword,
+      hashValue: admin.password,
+    });
+    if (!matchOld) {
+      return next(new Error("In-valid password", { cause: 400 }));
+    }
+    const checkMatchNew = compare({
+      plainText: newPassword,
+      hashValue: admin.password,
+    });
+    if (checkMatchNew) {
+      return next(
+        new Error("New password can't be old password", { cause: 400 })
+      );
+    }
+    const hashPassword = Hash({ plainText: newPassword });
+    req.body.password = hashPassword;
+    req.body.changeAccountInfo = Date.now();
+  }
 
   // Update the Admin in the database
   const updateAdmin = await adminModel.findByIdAndUpdate(
@@ -100,11 +98,9 @@ if (oldPassword && newPassword) {
   return res.status(200).json({
     status: "success",
     message: "Admin updated successfully.",
-    result: updateAdmin
+    result: updateAdmin,
   });
-
-
-})
+});
 //====================================================================================================================//
 //delete admin
 
@@ -356,6 +352,7 @@ export const creatAnnouncement = asyncHandler(async (req, res, next) => {
     if (io) {
       recipientIds.forEach((recipientId) => {
         io.to(recipientId).emit("notification", {
+          announcementId:announcement._id,
           title: announcement.announcementTitle,
           description: announcement.announcementDesc,
           createdAt: new Date(),
@@ -412,6 +409,8 @@ export const updateAnnouncement = asyncHandler(async (req, res, next) => {
     result: announcement,
   });
 });
+
+
 //====================================================================================================================//
 //update user
 
@@ -453,7 +452,7 @@ export const updateFamily = asyncHandler(async (req, res, next) => {
     const existingUser = await employeeModel.findOne({
       $or: [{ userName }, { email }],
     });
-  
+
     if (existingUser) {
       if (existingUser.userName === userName) {
         return next(
@@ -471,7 +470,7 @@ export const updateFamily = asyncHandler(async (req, res, next) => {
       }
     }
   }
-  
+
   if (checkUser.isDeleted == true) {
     return next(
       new Error(

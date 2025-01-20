@@ -3,29 +3,27 @@ import { generalFeilds } from "../../../middlewares/validation.middleware.js";
 
 export const headersSchema = generalFeilds.headers;
 
-export const updateAdminSchema =joi.object({
-  
-  adminId: generalFeilds.id,
+export const updateAdminSchema = joi
+  .object({
+    adminId: generalFeilds.id,
 
-  userName: generalFeilds.userName,
+    userName: generalFeilds.userName,
 
-  email: generalFeilds.email,
+    email: generalFeilds.email,
 
-  phone: generalFeilds.phone,
-  oldPassword: generalFeilds.password,
+    phone: generalFeilds.phone,
+    oldPassword: generalFeilds.password,
 
-  newPassword: generalFeilds.password
-    .disallow(joi.ref("oldPassword"))
-    .messages({
-      "any.invalid": "New Password cannot be the same as Old Password.",
-    }),
-
-}).required() .messages({
+    newPassword: generalFeilds.password
+      .disallow(joi.ref("oldPassword"))
+      .messages({
+        "any.invalid": "New Password cannot be the same as Old Password.",
+      }),
+  })
+  .required()
+  .messages({
     "object.base": "Input must be a valid object.",
   });
-
-
-
 
 export const deleteAdminSchema = joi
   .object({

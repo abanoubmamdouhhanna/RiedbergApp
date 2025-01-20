@@ -10,6 +10,7 @@ import {
   createReplyCommentSchema,
   deletePostSchema,
   geSpGallerySchema,
+  getAnnouncementSchema,
   getMaintenanceSchema,
   headersSchema,
   likeSchema,
@@ -196,5 +197,13 @@ router.get(
   auth(["admin", "superAdmin"]),
   operationController.allIds
 );
+
+//get announcement
+router.get("/getAnnouncement/:announcementId",
+  isValid(headersSchema, true),
+  auth(["user","employee"]),
+  isValid(getAnnouncementSchema),
+  operationController.getAnnouncement
+)
 
 export default router;

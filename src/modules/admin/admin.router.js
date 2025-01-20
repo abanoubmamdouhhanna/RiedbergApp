@@ -135,6 +135,7 @@ router.patch(
   adminController.updateAnnouncement
 );
 
+
 //update user
 router.patch(
   "/updateFamily/:userId",

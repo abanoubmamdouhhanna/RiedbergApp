@@ -8,6 +8,7 @@ import maintenanceModel from "../../../../DB/models/Maintenance.model.js";
 import userModel from "../../../../DB/models/User.model.js";
 import employeeModel from "../../../../DB/models/Employee.model.js";
 import adminModel from "../../../../DB/models/Admin.model.js";
+import announcementModel from "../../../../DB/models/Announcements.model.js";
 
 //profile
 
@@ -440,3 +441,19 @@ export const allIds=asyncHandler(async(req,res,next)=>
       allIds: Ids
     });
   })
+  //====================================================================================================================//
+//get announcement
+export const getAnnouncement =asyncHandler(async(req,res,next)=>
+  {
+    const {announcementId}=req.params
+    const announcement=await announcementModel.findById(announcementId)
+    if (!announcement) {
+      return next(new Error("Announcement not found", { cause: 404 }));
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Done",
+      result: announcement,
+    });
+  })
+  

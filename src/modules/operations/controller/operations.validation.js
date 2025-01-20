@@ -195,3 +195,12 @@ export const getMaintenanceSchema = joi
   .messages({
     "object.base": "Input must be a valid object.",
   });
+  
+  export const getAnnouncementSchema = joi
+    .object({
+      announcementId: generalFeilds.id,
+    })
+    .required()
+    .messages({
+      "object.base": "Input must be a valid object.",
+    });
