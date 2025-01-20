@@ -201,9 +201,16 @@ router.get(
 //get announcement
 router.get("/getAnnouncement/:announcementId",
   isValid(headersSchema, true),
-  auth(["user","employee"]),
+  auth(["admin", "superAdmin", "employee", "user"]),
   isValid(getAnnouncementSchema),
   operationController.getAnnouncement
+)
+
+//get all announcement
+router.get("/getAllAnnouncement",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin", "employee", "user"]),
+  operationController.getAllAnnouncement
 )
 
 export default router;

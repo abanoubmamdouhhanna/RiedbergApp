@@ -457,3 +457,17 @@ export const getAnnouncement =asyncHandler(async(req,res,next)=>
     });
   })
   
+  //====================================================================================================================//
+  //get all announcements
+
+  export const getAllAnnouncement =asyncHandler(async(req,res,next)=>
+  {
+    const announcement=await announcementModel.find()
+      return res.status(200).json({
+      status: "success",
+      message: "Done",
+      count:announcement.length,
+      result: announcement,
+    });
+  })
+  
