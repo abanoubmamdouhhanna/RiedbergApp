@@ -22,6 +22,14 @@ const fileValidation = (allowedTypesMap = {}) => {
     }
 
     const allowedMimeTypes = allowedTypesMap[file.fieldname] || [];
+      // Allow all images dynamically for 'announcementAttach'
+      if (
+        file.fieldname === "announcementAttach" &&
+        file.mimetype.startsWith("image/")
+      ) {
+        return cb(null, true); // Allow all image types
+      }
+  
     if (!allowedMimeTypes.includes(file.mimetype)) {
       return cb(
         new Error(`Invalid type for ${file.fieldname}`, { cause: 400 }),
