@@ -86,7 +86,8 @@ router.delete(
 );
 
 //get all posts
-router.get("/getPosts", 
+router.get("/getPosts",  isValid(headersSchema, true),
+auth(["admin", "superAdmin", "employee", "user"]),
 operationController.getPosts);
 
 //get user posts
