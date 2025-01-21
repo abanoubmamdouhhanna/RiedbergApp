@@ -135,11 +135,16 @@ export const updateAnnouncementSchema = joi
 
     author: generalFeilds.userName,
 
-    announcementTitle: joi.string().required(),
+    announcementTitle: joi.string(),
 
-    announcementDesc: joi.string().required(),
+    announcementDesc: joi.string(),
 
     Priority: joi.string().valid("Normal", "High"),
+    
+    type: joi
+      .string()
+      .valid("Information", "Event", "Maintenance")
+      .default("Information"),
   })
   .required()
   .messages({
