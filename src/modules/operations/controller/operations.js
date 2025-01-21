@@ -213,6 +213,62 @@ export const getPosts = async (req, res, next) => {
     .status(200)
     .json({ message: "All posts", result: postsWithUserInteraction });
 };
+//====================================================================================================================//
+const populateAllReplies = (depth) => {
+  let populateConfig = {
+    path: "reply",
+    populate: {},
+  };
+
+  if (depth > 1) {
+    populateConfig.populate = populateAllReplies(depth - 1);
+  } else {
+    populateConfig.populate = {
+      path: "createdBy",
+      select: "userName email phone",
+    };
+  }
+
+  return populateConfig;
+};
+
+//allPosts
+
+export const allPosts=asyncHandler(async(req,res,next)=>
+{
+  const userId = req.user._id; // Get the logged-in user's ID
+  const posts = await postModel
+    .find()
+    .populate({
+      path: "comments",
+      populate: populateAllReplies(10),
+    })
+    .populate({
+      path: "createdBy",
+      select: "userName email phone",
+    });
+
+  // Add `like` and `unliked` fields for the logged-in user
+  const postsWithUserInteraction = posts.map((post) => {
+    const isLiked = post.likes.some(
+      (like) => like.userId && like.userId.toString() === userId.toString()
+    );
+    const isUnliked = post.unlikes.some(
+      (unlike) =>
+        unlike.userId && unlike.userId.toString() === userId.toString()
+    );
+
+    return {
+      ...post.toObject(), // Convert the post document to a plain object
+      like: isLiked,
+      unliked: isUnliked,
+    };
+  });
+
+  return res
+    .status(200)
+    .json({ message: "All posts", result: postsWithUserInteraction });
+})
 
 //====================================================================================================================//
 //get user posts

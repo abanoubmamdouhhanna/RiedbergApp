@@ -90,6 +90,13 @@ router.get("/getPosts",  isValid(headersSchema, true),
 auth(["admin", "superAdmin", "employee", "user"]),
 operationController.getPosts);
 
+//get posts
+router.get("/allPosts",
+  isValid(headersSchema,true),
+  auth(["admin", "superAdmin", "employee", "user"]),
+  operationController.allPosts
+)
+
 //get user posts
 router.get(
   "/getUserPosts",
