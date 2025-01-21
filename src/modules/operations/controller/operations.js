@@ -50,9 +50,6 @@ export const profile = asyncHandler(async (req, res, next) => {
 
 export const getGallery = asyncHandler(async (req, res, next) => {
   const gallery = await galleryModel.find();
-  if (!gallery || gallery.length === 0) {
-    return next(new Error("no gellaries found", { cause: 404 }));
-  }
   return res.status(200).json({
     status: "success",
     message: "All gellaries",
