@@ -8,7 +8,7 @@ export const allowedTypesMap = {
   maintenanceImage: ["image/png", "image/jpeg","image/gif","image/webp"],
   problemImage: ["image/png", "image/jpeg","image/gif","image/webp"],
   appoinmentAttachment: ["image/png", "image/jpeg", "application/pdf","image/gif","image/webp"],
-  announcementAttach: ["image/png", "image/jpeg","image/jpg", "application/pdf","image/gif","image/webp"],
+  announcementAttach: ["image/png", "image/jpeg", "application/pdf","image/gif","image/webp"],
 };
 
 const fileValidation = (allowedTypesMap = {}) => {
@@ -20,14 +20,21 @@ const fileValidation = (allowedTypesMap = {}) => {
         false
       );
     }
-    if (!allowedTypesMap.announcementAttach) {
-      const allowedMimeTypes = allowedTypesMap[file.fieldname] || [];
-      if (!allowedMimeTypes.includes(file.mimetype)) {
-        return cb(
-          new Error(`Invalid type for ${file.fieldname}`, { cause: 400 }),
-          false
-        );
-      }
+    // if (!allowedTypesMap.announcementAttach) {
+    //   const allowedMimeTypes = allowedTypesMap[file.fieldname] || [];
+    //   if (!allowedMimeTypes.includes(file.mimetype)) {
+    //     return cb(
+    //       new Error(`Invalid type for ${file.fieldname}`, { cause: 400 }),
+    //       false
+    //     );
+    //   }
+    // }
+    const allowedMimeTypes = allowedTypesMap[file.fieldname] || [];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      return cb(
+        new Error(`Invalid type for ${file.fieldname}`, { cause: 400 }),
+        false
+      );
     }
 
     cb(null, true);
