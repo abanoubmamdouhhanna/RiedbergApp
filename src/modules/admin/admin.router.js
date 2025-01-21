@@ -84,6 +84,14 @@ router.delete(
   adminController.deleteGallery
 );
 
+//delete all gallaries
+router.delete(
+  "/deleteAllGalleries",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  adminController.deleteAllGalleries
+);
+
 // change maintenance status
 router.patch(
   "/changeStatus/:maintenanceId",
@@ -153,7 +161,7 @@ router.delete(
   adminController.deleteAllAnnouncements
 );
 
-//delete all announcement
+//delete sp announcement
 router.delete(
   "/deleteSpAnnouncement/:announcementId",
   isValid(headersSchema, true),

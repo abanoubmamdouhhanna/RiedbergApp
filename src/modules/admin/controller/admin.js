@@ -219,29 +219,46 @@ export const updateGallery = asyncHandler(async (req, res, next) => {
 //====================================================================================================================//
 //delete sp gallery
 
-export const deleteGallery=asyncHandler(async(req,res,next)=>
-{
-  const {galleryId}=req.params
+export const deleteGallery = asyncHandler(async (req, res, next) => {
+  const { galleryId } = req.params;
   const gallery = await galleryModel.findById(galleryId);
   if (!gallery) {
     return next(new Error("Gallery not found.", { cause: 404 }));
-    }
-    if (gallery.createdBy.toString() !== req.user._id.toString() && req.user.role !== "superAdmin") {
-      return next(new Error("You are not authorized to delete this gallery.", { cause: 401 }));
-    }
-  
-    const deletedGallery = await galleryModel.findByIdAndDelete(galleryId);
-    if (!deletedGallery) {
-      return next(new Error("Delete failed. Please try again.", { cause: 500 }));
-    }
-  
-    return res.status(200).json({
-      status: "success",
-      message: "Gallery deleted successfully.",
-      result: deletedGallery,
-    });
+  }
+  if (
+    gallery.createdBy.toString() !== req.user._id.toString() &&
+    req.user.role !== "superAdmin"
+  ) {
+    return next(
+      new Error("You are not authorized to delete this gallery.", {
+        cause: 401,
+      })
+    );
+  }
 
-})
+  const deletedGallery = await galleryModel.findByIdAndDelete(galleryId);
+  if (!deletedGallery) {
+    return next(new Error("Delete failed. Please try again.", { cause: 500 }));
+  }
+
+  return res.status(200).json({
+    status: "success",
+    message: "Gallery deleted successfully.",
+    result: deletedGallery,
+  });
+});
+//====================================================================================================================//
+//delete all galleries
+
+export const deleteAllGalleries = asyncHandler(async (req, res, next) => {
+  const deletedGallaries = await galleryModel.deleteMany();
+  return res.status(200).json({
+    status: "success",
+    message: "All gllaries deleted successfully.",
+    result: deletedGallaries,
+  });
+});
+
 //====================================================================================================================//
 // change maintenance status
 
@@ -378,7 +395,7 @@ export const creatAnnouncement = asyncHandler(async (req, res, next) => {
     if (io) {
       recipientIds.forEach((recipientId) => {
         io.to(recipientId).emit("notification", {
-          announcementId:announcement._id,
+          announcementId: announcement._id,
           title: announcement.announcementTitle,
           description: announcement.announcementDesc,
           createdAt: new Date(),
@@ -436,37 +453,38 @@ export const updateAnnouncement = asyncHandler(async (req, res, next) => {
   });
 });
 //====================================================================================================================//
-//delete all Announcements 
+//delete all Announcements
 
 export const deleteAllAnnouncements = asyncHandler(async (req, res, next) => {
-
   // Delete all announcements
-    const deletedAnnouncements = await announcementModel.deleteMany();
+  const deletedAnnouncements = await announcementModel.deleteMany();
 
-    return res.status(200).json({
-      status: "success",
-      message: "All announcements deleted successfully.",
-      result: deletedAnnouncements,
-    });
-
+  return res.status(200).json({
+    status: "success",
+    message: "All announcements deleted successfully.",
+    result: deletedAnnouncements,
+  });
 });
 //====================================================================================================================//
-//delete sp Announcements 
+//delete sp Announcements
 
 export const deleteSpAnnouncement = asyncHandler(async (req, res, next) => {
-  const announcement=await announcementModel.findById(req.params.announcementId)
+  const announcement = await announcementModel.findById(
+    req.params.announcementId
+  );
   if (!announcement) {
     return next(new Error("Announcement not found", { cause: 404 }));
   }
   // Delete all announcements
-    const deletedAnnouncements = await announcementModel.deleteOne({_id:req.params.announcementId});
+  const deletedAnnouncements = await announcementModel.deleteOne({
+    _id: req.params.announcementId,
+  });
 
-    return res.status(200).json({
-      status: "success",
-      message: "Announcement deleted successfully.",
-      result: deletedAnnouncements,
-    });
-
+  return res.status(200).json({
+    status: "success",
+    message: "Announcement deleted successfully.",
+    result: deletedAnnouncements,
+  });
 });
 //====================================================================================================================//
 //update user

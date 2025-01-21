@@ -150,6 +150,7 @@ export const updateAnnouncementSchema = joi
   .messages({
     "object.base": "Input must be a valid object.",
   });
+  
 export const deleteSpAnnouncementSchema = joi
   .object({
     announcementId: generalFeilds.id.required(),
