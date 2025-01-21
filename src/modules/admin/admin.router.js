@@ -11,6 +11,7 @@ import {
   createNotificationSchema,
   deleteAdminSchema,
   deleteGallerySchema,
+  deleteSpAnnouncementSchema,
   headersSchema,
   updateAdminSchema,
   updateAnnouncementSchema,
@@ -20,12 +21,13 @@ import {
 const router = Router();
 
 //update admin
-router.patch("/updateAdmin/:adminId",
+router.patch(
+  "/updateAdmin/:adminId",
   isValid(headersSchema, true),
   auth("superAdmin"),
   isValid(updateAdminSchema),
-  adminController.updateAdmin)
-
+  adminController.updateAdmin
+);
 
 //delete admin
 router.delete(
@@ -49,7 +51,7 @@ router.post(
   "/addGallery",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "galleryImages",
       maxCount: 5,
@@ -64,15 +66,14 @@ router.patch(
   "/updateGallery/:galleryId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "galleryImages",
       maxCount: 5,
     },
   ]),
   isValid(aupdateGallerySchema),
-  adminController.updateGallery,
-  
+  adminController.updateGallery
 );
 //delete gallery
 router.delete(
@@ -80,15 +81,15 @@ router.delete(
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
   isValid(deleteGallerySchema),
-  adminController.deleteGallery,
-)
+  adminController.deleteGallery
+);
 
 // change maintenance status
 router.patch(
   "/changeStatus/:maintenanceId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin", "employee"]),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "maintenanceStatusImage",
       maxCount: 1,
@@ -120,7 +121,7 @@ router.post(
   "/creatAnnouncement",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "announcementAttach",
       maxCount: 1,
@@ -135,7 +136,7 @@ router.patch(
   "/updateAnnouncement/:announcementId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
-  fileUpload(2,allowedTypesMap).fields([
+  fileUpload(2, allowedTypesMap).fields([
     {
       name: "announcementAttach",
       maxCount: 1,
@@ -144,7 +145,22 @@ router.patch(
   isValid(updateAnnouncementSchema),
   adminController.updateAnnouncement
 );
+//delete all announcement
+router.delete(
+  "/deleteAllAnnouncements",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  adminController.deleteAllAnnouncements
+);
 
+//delete all announcement
+router.delete(
+  "/deleteSpAnnouncement/:announcementId",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  isValid(deleteSpAnnouncementSchema),
+  adminController.deleteSpAnnouncement
+);
 
 //update user
 router.patch(
@@ -163,7 +179,5 @@ router.patch(
   isValid(updatePasswordSchema),
   adminController.updatePassword
 );
-
-
 
 export default router;

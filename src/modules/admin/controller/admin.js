@@ -435,8 +435,39 @@ export const updateAnnouncement = asyncHandler(async (req, res, next) => {
     result: announcement,
   });
 });
+//====================================================================================================================//
+//delete all Announcements 
 
+export const deleteAllAnnouncements = asyncHandler(async (req, res, next) => {
 
+  // Delete all announcements
+    const deletedAnnouncements = await announcementModel.deleteMany();
+
+    return res.status(200).json({
+      status: "success",
+      message: "All announcements deleted successfully.",
+      result: deletedAnnouncements,
+    });
+
+});
+//====================================================================================================================//
+//delete sp Announcements 
+
+export const deleteSpAnnouncement = asyncHandler(async (req, res, next) => {
+  const announcement=await announcementModel.findById(req.params.announcementId)
+  if (!announcement) {
+    return next(new Error("Announcement not found", { cause: 404 }));
+  }
+  // Delete all announcements
+    const deletedAnnouncements = await announcementModel.deleteOne({_id:req.params.announcementId});
+
+    return res.status(200).json({
+      status: "success",
+      message: "Announcement deleted successfully.",
+      result: deletedAnnouncements,
+    });
+
+});
 //====================================================================================================================//
 //update user
 
