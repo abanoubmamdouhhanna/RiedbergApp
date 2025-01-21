@@ -8,27 +8,26 @@ export const allowedTypesMap = {
   maintenanceImage: ["image/png", "image/jpeg","image/gif","image/webp"],
   problemImage: ["image/png", "image/jpeg","image/gif","image/webp"],
   appoinmentAttachment: ["image/png", "image/jpeg", "application/pdf","image/gif","image/webp"],
-  // announcementAttach: ["image/png", "image/jpeg","image/jpg", "application/pdf","image/gif","image/webp"],
-  announcementAttach: ["*/*"], // Allow all file types, including all image types
+  announcementAttach: ["image/png", "image/jpeg","image/jpg", "application/pdf","image/gif","image/webp"],
 };
 
 const fileValidation = (allowedTypesMap = {}) => {
   return asyncHandler(async (req, file, cb) => {
-    const fileExtension = file.originalname.split(".").pop().toLowerCase();
-    if (dangerousExtensions.includes(fileExtension)) {
-      return cb(
-        new Error(`File type '${fileExtension}' not allowed`, { cause: 400 }),
-        false
-      );
-    }
+    // const fileExtension = file.originalname.split(".").pop().toLowerCase();
+    // if (dangerousExtensions.includes(fileExtension)) {
+    //   return cb(
+    //     new Error(`File type '${fileExtension}' not allowed`, { cause: 400 }),
+    //     false
+    //   );
+    // }
 
-    const allowedMimeTypes = allowedTypesMap[file.fieldname] || [];
-    if (!allowedMimeTypes.includes(file.mimetype)) {
-      return cb(
-        new Error(`Invalid type for ${file.fieldname}`, { cause: 400 }),
-        false
-      );
-    }
+    // const allowedMimeTypes = allowedTypesMap[file.fieldname] || [];
+    // if (!allowedMimeTypes.includes(file.mimetype)) {
+    //   return cb(
+    //     new Error(`Invalid type for ${file.fieldname}`, { cause: 400 }),
+    //     false
+    //   );
+    // }
 
     cb(null, true);
   });

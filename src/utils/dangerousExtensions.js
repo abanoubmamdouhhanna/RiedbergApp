@@ -1,18 +1,18 @@
 export const dangerousExtensions = [
   // Executable and System Files
   "exe", "bat", "cmd", "com", "msi", "apk", "sh", "bash", "bin", "jar", "ps1", "wsf", "vbs", 
-  "vb", "scr", "reg", "dll", "pl", "py", "js", "cgi", "rb", "wsf", "app", "r", "asp", "aspx", 
-  "php", "php3", "php4", "php5", "phps", "phtml", "jsp", "cfm", "pl", "py", "js", "vbs", "pl", 
+  "vb", "scr", "reg", "dll", "pl", "py", "cgi", "rb", "wsf", "app", "r", "asp", "aspx", 
+  "php", "php3", "php4", "php5", "phps", "phtml", "jsp", "cfm", "pl", "py", "vbs", "pl", 
   "cshtml", "ajax", "json", "bat", "sh", "bash", "zsh", "csh", "ps1", "vbe", "jscript", "exe", 
   "msi", "py", "pl", "jar", "cgi", "html", "php5", "html5", "htm", "html", "shtml", "xhtml",
   "svg", "css", "scss", "ts", "jsm", "xaml", "vbscript", "es", "ts", "scss", "phtm", "dll", 
-  "dat", "dat", "bat", "sh", "wsf", "vbs", "js",
+  "dat", "dat", "bat", "sh", "wsf", "vbs", /*"js",*/
 
   // Web-related dangerous files
   "html", "htm", "xhtml", "xsl", "xml", "json", "tpl", "cfm", "erb", "asp", "aspx", "php5", 
   "php3", "php4", "phps", "phtml", "jsp", "cfm", "pl", "cgi", "shtml", "shtm", "css", 
   "tpl", "cfc", "json", "htaccess", "htpasswd", "inc", "svn", "git", "bak", "db", "sql", "sh", 
-  "bash", "php3", "php4", "jsp", "asp", "aspx", "html", "js", "js", "json", "php", "html", "htm", 
+  "bash", "php3", "php4", "jsp", "asp", "aspx", "html","json", "php", "html", "htm", 
   "json", "yaml", "yaml", "text", "txt", "log", "conf", "json", "ts", "yml", "xml", "ini", "csv", 
   "javascript", "ejs", "vue", "jsx", "html5",
 
@@ -33,10 +33,10 @@ export const dangerousExtensions = [
   "rpm", "img", "swf", "avi", "mkv", "mpg", "mpeg",
 
   // Malicious file types and scripting languages
-  "jar", "vbs", "php", "sh", "jsp", "htaccess", "asp", "html", "cgi", "js", "css", "json", 
-  "vbe", "bat", "cmd", "exe", "apk", "sh", "bash", "js", "html", "htm", "asp", "jsp", "htm", "php", 
-  "dat", "dat", "bat", "exe", "app", "jar", "exe", "js", "dll", "sys", "bat", "debug", "com", "msi",
-  "vmdk", "oob", "msp", "js", "swf", "asp", "html5", "pkg", "json", "msp", "js", "dmg", "apk", "bin",'locky','crypt',
+  "jar", "vbs", "php", "sh", "jsp", "htaccess", "asp", "html", "cgi", "css", "json", 
+  "vbe", "bat", "cmd", "exe", "apk", "sh", "bash",  "html", "htm", "asp", "jsp", "htm", "php", 
+  "dat", "dat", "bat", "exe", "app", "jar", "exe", "dll", "sys", "bat", "debug", "com", "msi",
+  "vmdk", "oob", "msp", "swf", "asp", "html5", "pkg", "json", "msp", "dmg", "apk", "bin",'locky','crypt',
 'cryptolocker', 'cerber','tesla','conti','wannacry','files','ransom','gzip','mp3','mp4','hta',
 
   // System-level files
@@ -47,11 +47,11 @@ export const dangerousExtensions = [
   "pvm", "ovf", "vhd", "ova", "bin", "htaccess", "dat", "debug", "msi", "bat", "cmd", "vbe", "pl",
   "jscript", "dll", "py", "rb", "cgi", "scpt", "nsf", "scr", "clj", "nsh", "command", "csh", "zsh", 
   "ksh", "tcsh", "fish", "cmd", "bash", "sh", "pl", "perl", "lua", "io", "pogo", "tk", "rst", "ejs", 
-  "json", "html5", "html", "htm", "js", "html", "cpp", "h", "pyc", "class", "exe", "pl", "pm", "cgi", 
+  "json", "html5", "html", "htm", "html", "cpp", "h", "pyc", "class", "exe", "pl", "pm", "cgi", 
   "osx", "dylib", "axd", "axd", "dat", "dmp", "pid", "bin", "swp", "swf", "scr", "bz2", "tar", "rar", 
-  "csv", "sql", "bak", "ico", "pfx", "s7z", "csv", "rst", "gpx", "asc", "keygen", "shs", "dat", "js", 
+  "csv", "sql", "bak", "ico", "pfx", "s7z", "csv", "rst", "gpx", "asc", "keygen", "shs", "dat",
   "html", "scss", "xml", "css", "md", "dll", "html5", "dat", "log", "txt", "xml", "odt", "exe", "pfx", 
-  "apk", "tar", "json", "css", "xml", "eps", "html5", "py", "sh", "js"
+  "apk", "tar", "json", "css", "xml", "eps", "html5", "py", "sh",
 ];
 
 //520
