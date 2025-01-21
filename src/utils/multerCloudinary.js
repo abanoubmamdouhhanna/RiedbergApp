@@ -8,7 +8,7 @@ export const allowedTypesMap = {
   maintenanceImage: ["image/png", "image/jpeg","image/gif","image/webp"],
   problemImage: ["image/png", "image/jpeg","image/gif","image/webp"],
   appoinmentAttachment: ["image/png", "image/jpeg", "application/pdf","image/gif","image/webp"],
-  announcementAttach: ["image/png", "image/jpeg", "application/pdf","image/gif","image/webp"],
+  announcementAttach: ["image/png", "image/jpeg","image/jpg", "application/pdf","image/gif","image/webp"],
 };
 
 const fileValidation = (allowedTypesMap = {}) => {
