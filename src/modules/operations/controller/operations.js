@@ -91,6 +91,23 @@ export const addPost = asyncHandler(async (req, res, next) => {
   }
   req.body.createdBy = req.user._id;
   req.body.authorType = req.user.role;
+
+  // Validate user type and set createdByModel dynamically
+  let createdByModel;
+  if (req.user.role ===( "admin" || "superAdmin")) {
+    createdByModel = "Admin";
+  } else if (req.user.role === "employee") {
+    createdByModel = "Employee";
+  } else if (req.user.role === "user") {
+    createdByModel = "User";
+  } else {
+    return next(
+      new Error("Invalid user role. Must be one of 'Admin', 'Employee', or 'User'.", { cause: 400 })
+    );
+  }
+
+req.body.createdByModel=createdByModel
+
   const addPost = await postModel.create(req.body);
   return res.status(201).json({
     status: "success",
@@ -161,59 +178,6 @@ export const deletePost = asyncHandler(async (req, res, next) => {
 });
 
 //====================================================================================================================//
-//get Posts
-const populateReplies = (depth) => {
-  let populateConfig = {
-    path: "reply",
-    populate: {},
-  };
-
-  if (depth > 1) {
-    populateConfig.populate = populateReplies(depth - 1);
-  } else {
-    populateConfig.populate = {
-      path: "createdBy",
-      select: "userName email phone",
-    };
-  }
-
-  return populateConfig;
-};
-
-export const getPosts = async (req, res, next) => {
-  const userId = req.user._id; // Get the logged-in user's ID
-  const posts = await postModel
-    .find()
-    .populate({
-      path: "comments",
-      populate: populateReplies(100),
-    })
-    .populate({
-      path: "createdBy",
-      select: "userName email phone",
-    });
-
-  // Add `like` and `unliked` fields for the logged-in user
-  const postsWithUserInteraction = posts.map((post) => {
-    const isLiked = post.likes.some(
-      (like) => like.userId.toString() === userId.toString()
-    );
-    const isUnliked = post.unlikes.some(
-      (unlike) => unlike.userId.toString() === userId.toString()
-    );
-
-    return {
-      ...post.toObject(), // Convert the post document to a plain object
-      like: isLiked,
-      unliked: isUnliked,
-    };
-  });
-
-  return res
-    .status(200)
-    .json({ message: "All posts", result: postsWithUserInteraction });
-};
-//====================================================================================================================//
 const populateAllReplies = (depth) => {
   let populateConfig = {
     path: "reply",
@@ -234,18 +198,26 @@ const populateAllReplies = (depth) => {
 
 //allPosts
 
-export const allPosts=asyncHandler(async(req,res,next)=>
-{
-  const userId = req.user._id; // Get the logged-in user's ID
+export const allPosts = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id; 
   const posts = await postModel
     .find()
     .populate({
-      path: "comments",
-      populate: populateAllReplies(10),
+      path: "createdBy", 
+      select: "userName email phone", 
     })
     .populate({
-      path: "createdBy",
-      select: "userName email phone",
+      path: "comments",
+      populate: [
+        {
+          path: "createdBy", 
+          select: "userName email phone", 
+        },
+        {
+          path: "reply",
+          populate: populateAllReplies(10),
+        },
+      ],
     });
 
   // Add `like` and `unliked` fields for the logged-in user
@@ -268,7 +240,9 @@ export const allPosts=asyncHandler(async(req,res,next)=>
   return res
     .status(200)
     .json({ message: "All posts", result: postsWithUserInteraction });
-})
+});
+
+
 
 //====================================================================================================================//
 //get user posts
@@ -327,22 +301,40 @@ export const createComment = asyncHandler(async (req, res, next) => {
 
   const post = await postModel.findById(postId);
   if (!post) {
-    return next(new Error("In-valid post ID", { cause: 400 }));
+    return next(new Error("Invalid post ID", { cause: 400 }));
   }
+
+  let createdByModel;
+  if (req.user.role ===( "admin"  || "superAdmin")) {
+    createdByModel = "Admin";
+  } else if (req.user.role === "employee") {
+    createdByModel = "Employee";
+  } else if (req.user.role === "user") {
+    createdByModel = "User";
+  } else {
+    return next(
+      new Error("Invalid user role. Must be one of 'Admin', 'Employee', or 'User'.", { cause: 400 })
+    );
+  }
+
   const comment = await commentModel.create({
     author: req.user.userName,
     createdBy: req.user._id,
+    createdByModel, 
     commentContent,
     postId,
   });
+
   post.comments.push(comment._id);
   await post.save();
+
   return res.status(201).json({
     status: "success",
     message: "Comment created successfully",
     comment,
   });
 });
+
 
 //====================================================================================================================//
 //create reply
@@ -355,10 +347,25 @@ export let createReplyComment = asyncHandler(async (req, res, next) => {
   if (!comment) {
     return next(new Error("In-valid comment ID", { cause: 400 }));
   }
+
+  let createdByModel;
+  if (req.user.role ===( "admin"  || "superAdmin")) {
+    createdByModel = "Admin";
+  } else if (req.user.role === "employee") {
+    createdByModel = "Employee";
+  } else if (req.user.role === "user") {
+    createdByModel = "User";
+  } else {
+    return next(
+      new Error("Invalid user role. Must be one of 'Admin', 'Employee', or 'User'.", { cause: 400 })
+    );
+  }
+
   let replyComment = await commentModel.create({
     commentContent,
     postId: comment.postId,
     createdBy: req.user._id,
+    createdByModel,
     author: req.user.userName,
   });
   comment.reply.push(replyComment);

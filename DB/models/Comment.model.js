@@ -27,8 +27,20 @@ const commentSchema = new Schema(
     unlikes: [reactionSchema], // Reference the reaction schema
 
     postId: { type: Types.ObjectId, ref: "Post", required: true },
+    
     reply: [{ type: Types.ObjectId, ref: "Comment" }],
-    createdBy: { type: Types.ObjectId, ref: "Admin", required: true },
+    
+    
+    createdBy: {
+      type: Types.ObjectId,
+      required: true,
+      refPath: "createdByModel", 
+    },
+    createdByModel: {
+      type: String,
+      required: true,
+      enum: ["User", "Employee", "Admin"], 
+    },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }

@@ -23,17 +23,22 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
-    likes: [reactionSchema], // Reference the reaction schema
-    unlikes: [reactionSchema], // Reference the reaction schema
+    likes: [reactionSchema],
+    unlikes: [reactionSchema], 
 
     authorType: {
       type: String,
       required: true,
-      enum: ["user", "admin", "superAdmin", "employee"], // Ensure it matches valid model types
+      enum: ["user", "admin", "superAdmin", "employee"], 
     },
     postImage: String,
     comments: [{ type: Types.ObjectId, ref: "Comment" }],
-    createdBy: { type: Types.ObjectId, required: true },
+    createdBy: { type: Types.ObjectId, refPath: "createdByModel", required: true },
+    createdByModel: {
+      type: String,
+      required: true,
+      enum: ["User", "Admin", "Employee"], 
+    },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
