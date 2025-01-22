@@ -2,7 +2,7 @@ import mongoose, { model, Schema, Types } from "mongoose";
 
 const gallerySchema = new Schema(
   {
-    customId:String,
+    customId: String,
     galleryTitle: {
       type: String,
       required: true,
@@ -11,22 +11,26 @@ const gallerySchema = new Schema(
       type: String,
       required: true,
     },
-    gallaryAuthorType:String,
+    gallaryAuthorType: String,
     galleryImages: [
       {
         imageUrl: { type: String, required: true },
         imageDate: {
           type: String,
-          required:true,
-          default:()=> new Date().toISOString().split("T")[0],
-        }
-      }
+          required: true,
+          default: () => new Date().toISOString().split("T")[0],
+        },
+      },
     ],
     createdBy: { type: Types.ObjectId, ref: "Admin", required: true },
-    updatedBy: { type: Types.ObjectId, ref: "Admin"},
+    updatedBy: { type: Types.ObjectId, ref: "Admin" },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+gallerySchema.pre("find", function () {
+  this.where({ isDeleted: false });
+});
+
 const galleryModel = mongoose.models.Gallery || model("Gallery", gallerySchema);
 export default galleryModel;

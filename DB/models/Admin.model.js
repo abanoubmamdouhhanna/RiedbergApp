@@ -29,9 +29,16 @@ const adminSchema = new Schema(
       default: "admin",
       enum: ["admin", "superAdmin"],
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
+adminSchema.pre("find", function () {
+  this.where({ isDeleted: false });
+});
 
 const adminModel = mongoose.models.Admin || model("Admin", adminSchema);
 export default adminModel;

@@ -31,15 +31,10 @@ const userSchema = new Schema(
       type: String,
       default: new Date().toISOString().split("T")[0],
     },
-    // familyMembers: {
-    //   type: Map,
-    //   of: Number,
-    //   default: { father: 1, mother: 1, son: 0, daughter: 0 },
-    // },
-    memberType: { 
-      type: String, 
-      required: true, 
-      enum: ["father", "mother", "son", "daughter"] 
+    memberType: {
+      type: String,
+      required: true,
+      enum: ["father", "mother", "son", "daughter"],
     },
     role: {
       type: String,
@@ -59,6 +54,8 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
-
+userSchema.pre("find", function () {
+  this.where({ isDeleted: false });
+});
 const userModel = mongoose.models.User || model("User", userSchema);
 export default userModel;

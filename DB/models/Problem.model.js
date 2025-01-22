@@ -13,8 +13,16 @@ const problemSchema = new Schema(
     problemImage: String,
     createdBy: { type: Types.ObjectId, ref: "Employee", required: true },
     creationDate: { type: Date, default: Date.now },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
+problemSchema.pre("find", function () {
+  this.where({ isDeleted: false });
+});
+
 const problemModel = mongoose.models.Problem || model("Problem", problemSchema);
 export default problemModel;

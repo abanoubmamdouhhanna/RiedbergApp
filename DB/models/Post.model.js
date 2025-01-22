@@ -24,24 +24,32 @@ const postSchema = new Schema(
       required: true,
     },
     likes: [reactionSchema],
-    unlikes: [reactionSchema], 
+    unlikes: [reactionSchema],
 
     authorType: {
       type: String,
       required: true,
-      enum: ["user", "admin", "superAdmin", "employee"], 
+      enum: ["user", "admin", "superAdmin", "employee"],
     },
     postImage: String,
     comments: [{ type: Types.ObjectId, ref: "Comment" }],
-    createdBy: { type: Types.ObjectId, refPath: "createdByModel", required: true },
+    createdBy: {
+      type: Types.ObjectId,
+      refPath: "createdByModel",
+      required: true,
+    },
     createdByModel: {
       type: String,
       required: true,
-      enum: ["User", "Admin", "Employee"], 
+      enum: ["User", "Admin", "Employee"],
     },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+postSchema.pre("find", function () {
+  this.where({ isDeleted: false });
+});
+
 const postModel = mongoose.models.Post || model("Post", postSchema);
 export default postModel;

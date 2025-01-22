@@ -2,7 +2,7 @@ import mongoose, { model, Schema, Types } from "mongoose";
 
 const maintenanceSchema = new Schema(
   {
-    customId:String,
+    customId: String,
     categoryName: {
       type: String,
       default: "Pluming",
@@ -30,6 +30,10 @@ const maintenanceSchema = new Schema(
   },
   { timestamps: true }
 );
+
+maintenanceSchema.pre("find", function () {
+  this.where({ isDeleted: false });
+});
 
 const maintenanceModel =
   mongoose.models.Maintenance || model("Maintenance", maintenanceSchema);

@@ -51,24 +51,26 @@ const employeeSchema = new Schema(
         ],
       },
     ],
-    days:[{type:String,
-      default:"Saturday",
-      enum: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday"
-      ]
-    }]
-    ,changeAccountInfo: Date,
-      isDeleted: {
+    days: [
+      {
+        type: String,
+        default: "Saturday",
+        enum: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+      },
+    ],
+    changeAccountInfo: Date,
+    isDeleted: {
       type: Boolean,
       default: false,
     },
-
 
     schedule: [
       {
@@ -76,9 +78,10 @@ const employeeSchema = new Schema(
         times: [String], // Reserved times ["09:00", "10:30", ...]
       },
     ],
-
-
-
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
     isBlocked: {
       type: Boolean,
       default: false,
@@ -86,6 +89,9 @@ const employeeSchema = new Schema(
   },
   { timestamps: true }
 );
+employeeSchema.pre("find", function () {
+  this.where({ isDeleted: false });
+});
 
 const employeeModel =
   mongoose.models.Employee || model("Employee", employeeSchema);

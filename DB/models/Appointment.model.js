@@ -1,7 +1,7 @@
 import mongoose, { model, Schema, Types } from "mongoose";
 
 const appoinmentSchema = new Schema({
-  appoinmentTitle:{
+  appoinmentTitle: {
     type: String,
     required: true,
   },
@@ -18,12 +18,15 @@ const appoinmentSchema = new Schema({
     ref: "Employee",
   },
   reason: {
-    type:String,
-    required:true
+    type: String,
+    required: true,
   },
   notes: String,
   appoinmentAttachment: String,
   isDeleted: { type: Boolean, default: false },
+});
+appoinmentSchema.pre("find", function () {
+  this.where({ isDeleted: false });
 });
 
 const appoinmentModel =
