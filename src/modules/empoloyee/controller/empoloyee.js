@@ -53,7 +53,16 @@ export const updateEmployee = asyncHandler(async (req, res, next) => {
   if (!empoloyee) {
     return next(new Error("Employee not found", { cause: 404 }));
   }
-  if (!(userName || email || phone || (oldPassword && newPassword))) {
+  if (
+    !(
+      userName ||
+      email ||
+      phone ||
+      (oldPassword && newPassword) ||
+      (Array.isArray(languages) && languages.length > 0) ||
+      (Array.isArray(days) && days.length > 0)
+    )
+  ) {
     return next(new Error("We need information to update", { cause: 400 }));
   }
   if (userName || email || phone) {
