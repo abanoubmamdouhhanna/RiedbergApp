@@ -189,7 +189,7 @@ export const updateMaintenanceSchema = joi
 
 export const getMaintenanceSchema = joi
   .object({
-    maintenanceId: generalFeilds.id,
+    maintenanceId: generalFeilds.id.required(),
   })
   .required()
   .messages({
