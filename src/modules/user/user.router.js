@@ -59,7 +59,7 @@ router.post(
 router.get(
   "/usersProfiles",
   isValid(headersSchema, true),
-  auth(["admin", "superAdmin"]),
+  auth(["admin", "superAdmin","employee"]),
   userController.usersProfiles
 );
 

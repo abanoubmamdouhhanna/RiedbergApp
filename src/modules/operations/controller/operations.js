@@ -92,20 +92,23 @@ export const addPost = asyncHandler(async (req, res, next) => {
   req.body.createdBy = req.user._id;
   req.body.authorType = req.user.role;
 
-  // Validate user type and set createdByModel dynamically
-  let createdByModel;
-  if (req.user.role ===( "admin" || "superAdmin")) {
-    createdByModel = "Admin";
-  } else if (req.user.role === "employee") {
-    createdByModel = "Employee";
-  } else if (req.user.role === "user") {
-    createdByModel = "User";
-  } else {
+  const roleToModelMap = {
+    admin: "Admin",
+    superAdmin: "Admin", // Assuming superAdmin is also mapped to the Admin model
+    employee: "Employee",
+    user: "User",
+  };
+  
+  const createdByModel = roleToModelMap[req.user.role];
+  
+  if (!createdByModel) {
     return next(
-      new Error("Invalid user role. Must be one of 'Admin', 'Employee', or 'User'.", { cause: 400 })
+      new Error(
+        "Invalid user role",
+        { cause: 400 }
+      )
     );
   }
-
 req.body.createdByModel=createdByModel
 
   const addPost = await postModel.create(req.body);
@@ -270,17 +273,17 @@ export const getUserPosts = async (req, res, next) => {
 
   const posts = await postModel.find({ createdBy: userId }).populate({
     path: "comments",
-    populate: populateReplies(100), //Maximum call stack size :2379
+    populate: populateUserReplies(10), //Maximum call stack size :2379
   });
   // Add `like` and `unliked` fields for the logged-in user
   const postsWithUserInteraction = posts.map((post) => {
     const isLiked = post.likes.some(
-      (like) => like.userId.toString() === userId.toString()
+      (like) => like.userId && like.userId.toString() === userId.toString()
     );
     const isUnliked = post.unlikes.some(
-      (unlike) => unlike.userId.toString() === userId.toString()
+      (unlike) =>
+        unlike.userId && unlike.userId.toString() === userId.toString()
     );
-
     return {
       ...post.toObject(), // Convert the post document to a plain object
       like: isLiked,
@@ -303,17 +306,21 @@ export const createComment = asyncHandler(async (req, res, next) => {
   if (!post) {
     return next(new Error("Invalid post ID", { cause: 400 }));
   }
-
-  let createdByModel;
-  if (req.user.role ===( "admin"  || "superAdmin")) {
-    createdByModel = "Admin";
-  } else if (req.user.role === "employee") {
-    createdByModel = "Employee";
-  } else if (req.user.role === "user") {
-    createdByModel = "User";
-  } else {
+  const roleToModelMap = {
+    admin: "Admin",
+    superAdmin: "Admin", 
+    employee: "Employee",
+    user: "User",
+  };
+  
+  const createdByModel = roleToModelMap[req.user.role];
+  
+  if (!createdByModel) {
     return next(
-      new Error("Invalid user role. Must be one of 'Admin', 'Employee', or 'User'.", { cause: 400 })
+      new Error(
+        "Invalid user role",
+        { cause: 400 }
+      )
     );
   }
 
