@@ -541,7 +541,15 @@ export const updateMaintenance = asyncHandler(async (req, res, next) => {
 //get maintenance
 
 export const getMaintenance = asyncHandler(async (req, res, next) => {
+
   const maintenance = await maintenanceModel.findById(req.params.maintenanceId);
+  if (!maintenance) {
+    return next(
+      new Error("In-valid maintenance ID", {
+        cause: 404,
+      })
+    );
+  }
 
   return res.status(200).json({
     status: "success",
