@@ -11,7 +11,6 @@ import {
   deletePostSchema,
   geSpGallerySchema,
   getAnnouncementSchema,
-  getMaintenanceSchema,
   headersSchema,
   likeSchema,
   PostLikeSchema,
@@ -188,7 +187,6 @@ router.get(
   "/getMaintenance",
   isValid(headersSchema, true),
   auth(["user"]),
-  isValid(getMaintenanceSchema),
   operationController.getMaintenance
 );
 
