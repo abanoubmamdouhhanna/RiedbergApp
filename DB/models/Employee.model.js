@@ -28,6 +28,7 @@ const employeeSchema = new Schema(
       default: "employee",
       enum: ["employee"],
     },
+    workSpecialization:String,
     languages: [
       {
         type: String,

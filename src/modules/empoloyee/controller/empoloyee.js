@@ -10,7 +10,7 @@ import appoinmentModel from "../../../../DB/models/Appointment.model.js";
 
 //create employee
 export const createEmployee = asyncHandler(async (req, res, next) => {
-  const { userName, email, password, phone, languages, days } = req.body;
+  const { userName, email, password, phone, languages, days,workSpecialization } = req.body;
 
   // Run the email and username existence checks in parallel
   const [existedUser, checkExistUserName] = await Promise.all([
@@ -36,6 +36,7 @@ export const createEmployee = asyncHandler(async (req, res, next) => {
     phone,
     languages,
     days,
+    workSpecialization
   });
   return res.status(201).json({
     message: "employee added successfully.",
@@ -47,7 +48,7 @@ export const createEmployee = asyncHandler(async (req, res, next) => {
 
 export const updateEmployee = asyncHandler(async (req, res, next) => {
   const { employeeId } = req.params;
-  const { userName, email, phone, languages, days, oldPassword, newPassword } =
+  const { userName, email, phone, languages, days, oldPassword, newPassword,workSpecialization } =
     req.body;
   const empoloyee = await employeeModel.findById(employeeId);
   if (!empoloyee) {
@@ -57,7 +58,7 @@ export const updateEmployee = asyncHandler(async (req, res, next) => {
     !(
       userName ||
       email ||
-      phone ||
+      phone ||workSpecialization||
       (oldPassword && newPassword) ||
       (Array.isArray(languages) && languages.length > 0) ||
       (Array.isArray(days) && days.length > 0)
