@@ -546,7 +546,7 @@ export const getMaintenance = asyncHandler(async (req, res, next) => {
   const maintenance = await maintenanceModel.find({createdBy:req.user._id});
   if (!maintenance) {
     return next(
-      new Error("In-valid maintenance ID", {
+      new Error("no maintenances found", {
         cause: 404,
       })
     );
