@@ -11,7 +11,7 @@ export const createEmployeeSchema = joi
 
     password: generalFeilds.password.required(),
 
-    workSpecialization:joi.string().required(),
+    workSpecialization:joi.array().required(),
 
     cPassword: generalFeilds.cPassword.valid(joi.ref("password")).required(),
 
@@ -74,7 +74,7 @@ export const updateEmployeeSchema = joi
 
     email: generalFeilds.email,
 
-    workSpecialization:joi.string(),
+    workSpecialization:joi.array(),
 
     oldPassword: generalFeilds.password,
 

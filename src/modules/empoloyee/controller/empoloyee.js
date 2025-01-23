@@ -58,10 +58,11 @@ export const updateEmployee = asyncHandler(async (req, res, next) => {
     !(
       userName ||
       email ||
-      phone ||workSpecialization||
+      phone ||
       (oldPassword && newPassword) ||
       (Array.isArray(languages) && languages.length > 0) ||
-      (Array.isArray(days) && days.length > 0)
+      (Array.isArray(days) && days.length > 0)||
+      (Array.isArray(workSpecialization) && workSpecialization.length > 0)
     )
   ) {
     return next(new Error("We need information to update", { cause: 400 }));
