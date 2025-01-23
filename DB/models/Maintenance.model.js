@@ -25,7 +25,7 @@ const maintenanceSchema = new Schema(
     maintenanceImage: String,
     maintenanceStatusImage: String,
     feedbackComment: String,
-    createdBy: { type: Types.ObjectId, ref: "Admin", required: true },
+    createdBy: { type: Types.ObjectId, ref: "User", required: true },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }

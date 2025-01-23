@@ -493,6 +493,7 @@ export const addMaintenance = asyncHandler(async (req, res, next) => {
     req.body.maintenanceImage = maintenanceImage.secure_url;
   }
   req.body.createdBy = req.user._id;
+  
   const addMaintenance = await maintenanceModel.create(req.body);
   return res.status(201).json({
     status: "success",
@@ -542,7 +543,7 @@ export const updateMaintenance = asyncHandler(async (req, res, next) => {
 
 export const getMaintenance = asyncHandler(async (req, res, next) => {
 
-  const maintenance = await maintenanceModel.findById(req.user._id);
+  const maintenance = await maintenanceModel.find({});
   if (!maintenance) {
     return next(
       new Error("In-valid maintenance ID", {
