@@ -71,4 +71,12 @@ router.get(
   userController.usersIds
 );
 
+//get user appoinments
+router.get(
+  "/userAppoinments",
+  isValid(headersSchema, true),
+  auth("user"),
+  userController.userAppoinments
+)
+
 export default router;

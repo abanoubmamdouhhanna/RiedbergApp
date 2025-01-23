@@ -10,6 +10,7 @@ import galleryModel from "../../../../DB/models/Gallery.model.js";
 import announcementModel from "../../../../DB/models/Announcements.model.js";
 import { compare, Hash } from "../../../utils/Hash&Compare.js";
 import { Server } from "socket.io";
+import appoinmentModel from "../../../../DB/models/Appointment.model.js";
 
 //update admin
 export const updateAdmin = asyncHandler(async (req, res, next) => {
@@ -678,3 +679,19 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
     result: user,
   });
 });
+//====================================================================================================================//
+//get all appoinments
+
+export const getAllAppoinments =asyncHandler(async(req,res,next)=>
+{
+  const appoinments=await appoinmentModel.find()
+  if (!appoinments) {
+    return next(new Error("No appoinments found!", { cause: 404 }));
+  }
+  return res.status(200).json({
+    status: "success",
+    message: "Done!",
+    count:appoinments.length,
+    result: appoinments,
+  });
+})

@@ -200,6 +200,8 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
   await employee.save();
 
   req.body.employeeId = employeeId;
+  req.body.createdBy=req.user._id;
+
 
   const appoinment = await appoinmentModel.create(req.body);
   if (!appoinment) {
@@ -238,3 +240,19 @@ export const usersIds=asyncHandler(async(req,res,next)=>
       result: usersIds,
     });
   })
+//====================================================================================================================//
+//get user appoinments
+
+export const userAppoinments=asyncHandler(async(req,res,next)=>
+{
+  const userAppoinments =await appoinmentModel.find({createdBy:req.user._id})
+  if (!userAppoinments) {
+    return next(new Error("You havn't any appoinments", { cause: 404 }));
+  }
+  return res.status(200).json({
+    status: "success",
+    message: "Done!",
+    count:userAppoinments.length,
+    result: userAppoinments,
+  });
+})

@@ -188,4 +188,11 @@ router.patch(
   adminController.updatePassword
 );
 
+//get all appointments
+router.get("/getAllAppoinments",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  adminController.getAllAppoinments
+)
+
 export default router;

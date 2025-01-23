@@ -23,6 +23,7 @@ const appoinmentSchema = new Schema({
   },
   notes: String,
   appoinmentAttachment: String,
+  createdBy:{type:Types.ObjectId,ref:"User"},
   isDeleted: { type: Boolean, default: false },
 });
 appoinmentSchema.pre("find", function () {
