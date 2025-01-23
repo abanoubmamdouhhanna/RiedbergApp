@@ -185,9 +185,9 @@ router.patch(
 
 //get maintenance
 router.get(
-  "/getMaintenance/:maintenanceId",
+  "/getMaintenance",
   isValid(headersSchema, true),
-  auth(["admin", "superAdmin", "employee", "user"]),
+  auth(["user"]),
   isValid(getMaintenanceSchema),
   operationController.getMaintenance
 );
