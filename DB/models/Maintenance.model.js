@@ -22,6 +22,7 @@ const maintenanceSchema = new Schema(
       default: "Pending",
       enum: ["Pending", "Accepted", "In-Progress", "Completed", "Cancelled"],
     },
+    notes:String,
     maintenanceImage: String,
     maintenanceStatusImage: String,
     feedbackComment: String,

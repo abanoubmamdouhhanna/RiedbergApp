@@ -157,6 +157,7 @@ export const addGallery = asyncHandler(async (req, res, next) => {
     }
     req.body.galleryImages = uploadedImages;
   }
+  req.body.customId=customId
   req.body.createdBy = req.user._id;
   req.body.gallaryAuthorType = req.user.role;
   const gallery = await galleryModel.create(req.body);
@@ -360,9 +361,9 @@ export const createNotification = asyncHandler(async (req, res, next) => {
 //create announcement
 
 export const creatAnnouncement = asyncHandler(async (req, res, next) => {
+  const customId = nanoid();
   if (req.files?.announcementAttach?.[0]?.path) {
     try {
-      const customId = nanoid();
       req.body.customId = customId;
       const announcementAttach = await cloudinary.uploader.upload(
         req.files.announcementAttach[0].path,
@@ -377,6 +378,7 @@ export const creatAnnouncement = asyncHandler(async (req, res, next) => {
     }
   }
   req.body.author = req.user.userName;
+  req.body.customId=customId
   req.body.createdBy = req.user._id;
   const announcement = await announcementModel.create(req.body);
 

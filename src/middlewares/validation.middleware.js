@@ -83,7 +83,7 @@ export const isValid = (joiSchema, considerHeaders = false) => {
     if (error) {
       return res
         .status(422)
-        .json({ message: "Validation Error",status_code: 422, Error: error.message });
+        .json({ message: "Validation Error",status_code: 422, Error: error.message});
     } else {
       return next();
     }

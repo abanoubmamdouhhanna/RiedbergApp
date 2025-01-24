@@ -77,8 +77,8 @@ export const geSpGallery = asyncHandler(async (req, res, next) => {
 //add post
 
 export const addPost = asyncHandler(async (req, res, next) => {
+  const customId = nanoid();
   if (req.files?.postImage?.[0]?.path) {
-    const customId = nanoid();
     req.body.customId = customId;
     const postImage = await cloudinary.uploader.upload(
       req.files.postImage[0].path,
@@ -91,6 +91,7 @@ export const addPost = asyncHandler(async (req, res, next) => {
   }
   req.body.createdBy = req.user._id;
   req.body.authorType = req.user.role;
+  req.body.customId=customId
 
   const roleToModelMap = {
     admin: "Admin",
@@ -480,8 +481,8 @@ export let addPostUnLike = asyncHandler(async (req, res, next) => {
 //Add Maintenance
 
 export const addMaintenance = asyncHandler(async (req, res, next) => {
+  const customId = nanoid();
   if (req.files?.maintenanceImage?.[0]?.path) {
-    const customId = nanoid();
     req.body.customId = customId;
     const maintenanceImage = await cloudinary.uploader.upload(
       req.files.maintenanceImage[0].path,
@@ -493,8 +494,8 @@ export const addMaintenance = asyncHandler(async (req, res, next) => {
     req.body.maintenanceImage = maintenanceImage.secure_url;
   }
   req.body.createdBy = req.user._id;
-  
-  const addMaintenance = await maintenanceModel.create(req.body);
+  req.body.customId=customId
+   const addMaintenance = await maintenanceModel.create(req.body);
   return res.status(201).json({
     status: "success",
     message: "Maintenance created successfully",

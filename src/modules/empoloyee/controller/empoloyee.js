@@ -165,8 +165,8 @@ export const createProblem = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("Invalid user ID", { cause: 404 }));
   }
+  const customId = nanoid();
   if (req.files?.problemImage?.[0]?.path) {
-    const customId = nanoid();
     const problemImage = await cloudinary.uploader.upload(
       req.files.problemImage[0].path,
       {
@@ -177,6 +177,7 @@ export const createProblem = asyncHandler(async (req, res, next) => {
     req.body.problemImage = problemImage.secure_url;
   }
   req.body.createdBy = req.user._id;
+  req.body.customId=customId
   const addProblem = await problemModel.create(req.body);
   user.userProblems.push(addProblem._id);
   await user.save();

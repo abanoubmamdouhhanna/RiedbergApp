@@ -93,6 +93,8 @@ export const PostLikeSchema = joi
 
 export const addMaintenanceSchema = joi
   .object({
+
+   
     categoryName: joi
       .string()
       .valid("Pluming", "Electrical", "Heating", "Other") // Allowed values
@@ -130,10 +132,17 @@ export const addMaintenanceSchema = joi
           "Maintenance order status must be one of ['Pending', 'Accepted', 'In-Progress', 'Completed', 'Cancelled'].",
         "any.required": "Maintenance order status is required.",
       }),
+      notes: joi
+      .string()
+      .optional() 
+      .messages({
+        "string.base": "Notes must be a string.",
+      }),
 
     file: joi.object({
       maintenanceImage: joi.array().items(generalFeilds.file).length(1),
-    }),
+
+  }),
   })
   .required()
   .messages({
@@ -177,9 +186,17 @@ export const updateMaintenanceSchema = joi
           "Maintenance order status must be one of ['Pending', 'Accepted', 'In-Progress', 'Completed', 'Cancelled'].",
         "any.required": "Maintenance order status is required.",
       }),
-
+      notes: joi
+      .string()
+      .optional() 
+      .messages({
+        "string.base": "Notes must be a string.",
+      }),
+      
     file: joi.object({
       maintenanceImage: joi.array().items(generalFeilds.file).length(1),
+
+      notes:joi.string()
     }),
   })
   .required()

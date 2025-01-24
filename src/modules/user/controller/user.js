@@ -131,6 +131,7 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
   const { appoinmentAttachment } = req.files || {};
   const { appoinmentTitle, appoinmentDate, appoinmentTime, reason } = req.body;
   const { employeeId } = req.params;
+  const customId = nanoid();
 
   if (!appoinmentTitle || !appoinmentDate || !appoinmentTime || !reason) {
     return next(
@@ -174,7 +175,6 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
 
   if (appoinmentAttachment?.[0]?.path) {
    try {
-      const customId = nanoid();
       const uploadedAttachment = await cloudinary.uploader.upload(
         appoinmentAttachment[0].path,
         {
@@ -201,7 +201,7 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
 
   req.body.employeeId = employeeId;
   req.body.createdBy=req.user._id;
-
+  req.body.customId=customId
 
   const appoinment = await appoinmentModel.create(req.body);
   if (!appoinment) {
