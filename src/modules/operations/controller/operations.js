@@ -342,8 +342,26 @@ export const createComment = asyncHandler(async (req, res, next) => {
     comment,
   });
 });
+//====================================================================================================================//
+//get post comments
 
+export const getComments=asyncHandler(async(req,res,next)=>
+{
+  const {postId}=req.params
+  const post=await postModel.findById(postId)
+  if (!post) {
+    return next(new Error("Invalid post ID", { cause: 400 }));
 
+  }
+
+  const comments =await commentModel.find({postId},"author commentContent likes unlikes createdAt")
+  return res.status(200).json({
+    status: "success",
+    message: "All post comments",
+    comments,
+  });
+
+})
 //====================================================================================================================//
 //create reply
 
@@ -380,6 +398,31 @@ export let createReplyComment = asyncHandler(async (req, res, next) => {
   await comment.save();
   return res.status(201).json({ message: "Done", replyComment });
 });
+//====================================================================================================================//
+
+// Get all replies to a comment
+export const getReplies = asyncHandler(async (req, res, next) => {
+  const { commentId } = req.params;
+
+  const comment = await commentModel.findById(commentId);
+  if (!comment) {
+    return next(new Error("Invalid comment ID", { cause: 400 }));
+  }
+
+  const populatedComment = await commentModel
+    .findById(commentId)
+    .populate({
+      path: "reply",
+      select: "author commentContent likes unlikes createdAt", 
+    });
+
+  return res.status(200).json({
+    status: "success",
+    message: "Replies fetched successfully",
+    replies: populatedComment?.reply || [],
+  });
+});
+
 //====================================================================================================================//
 //add comment like
 

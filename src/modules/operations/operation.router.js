@@ -108,6 +108,14 @@ router.post(
   operationController.createComment
 );
 
+//get post comments
+router.get(
+  "/getComments/:postId",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin", "employee", "user"]),
+  operationController.getComments
+);
+
 //create reply
 router.post(
   "/:commentId/reply",
@@ -116,6 +124,15 @@ router.post(
   isValid(createReplyCommentSchema),
   operationController.createReplyComment
 );
+
+//get post replies
+router.get(
+  "/getReplies/:commentId",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin", "employee", "user"]),
+  operationController.getReplies
+);
+
 
 //add like
 router.patch(
