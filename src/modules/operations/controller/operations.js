@@ -354,7 +354,7 @@ export const getComments=asyncHandler(async(req,res,next)=>
 
   }
 
-  const comments =await commentModel.find({postId})
+  const comments =await commentModel.find({postId, isReply: false})
   .populate({
     path: "reply",
     populate: [
@@ -403,6 +403,7 @@ export let createReplyComment = asyncHandler(async (req, res, next) => {
     createdBy: req.user._id,
     createdByModel,
     author: req.user.userName,
+    isReply:true
   });
   comment.reply.push(replyComment);
   await comment.save();

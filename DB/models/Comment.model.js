@@ -30,6 +30,8 @@ const commentSchema = new Schema(
 
     reply: [{ type: Types.ObjectId, ref: "Comment" }],
 
+    isReply: { type: Boolean, default: false }, // Flag to differentiate replies
+
     createdBy: {
       type: Types.ObjectId,
       required: true,
