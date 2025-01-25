@@ -354,7 +354,17 @@ export const getComments=asyncHandler(async(req,res,next)=>
 
   }
 
-  const comments =await commentModel.find({postId},"author commentContent likes unlikes createdAt")
+  const comments =await commentModel.find({postId})
+  .populate({
+    path: "reply",
+    populate: [
+        {
+        path: "reply",
+        populate: populateAllReplies(10),
+      },
+    ],
+  });
+
   return res.status(200).json({
     status: "success",
     message: "All post comments",
