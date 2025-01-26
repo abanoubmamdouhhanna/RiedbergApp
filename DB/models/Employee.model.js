@@ -76,7 +76,7 @@ const employeeSchema = new Schema(
     schedule: [
       {
         date: String, // "YYYY-MM-DD"
-        times: [String], // Reserved times ["09:00", "10:30", ...]
+        times: { type: [String], default: [] }, // Reserved times ["09:00", "10:30", ...]
       },
     ],
     isDeleted: {
