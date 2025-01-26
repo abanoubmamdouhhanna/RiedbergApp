@@ -8,7 +8,7 @@ const responseSchema = new Schema(
       required: true,
     },
     userId: { type: mongoose.Types.ObjectId, required: true },
-    userType: { type: String, enum: ["User", "Employee"], required: true },
+    userType: { type: String, enum: ["user", "employee"], required: true },
     userName: { type: String, required: true },
     status: {
       type: String,

@@ -36,7 +36,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
   });
+  
+  socket.on("error", (err) => {
+    console.error(`Socket.IO Error: ${err.message}`);
+  });
 });
+
 
 initApp(app, express);
 
