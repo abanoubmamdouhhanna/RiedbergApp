@@ -94,10 +94,8 @@ export const changeStatusSchema = joi
 
 export const createNotificationSchema = joi
   .object({
-    recipientId: generalFeilds.id,
     notifyTitle: joi.string().required(),
     notifyDescription: joi.string().required(),
-    recipientType: joi.string().required(),
   })
   .required()
   .messages({

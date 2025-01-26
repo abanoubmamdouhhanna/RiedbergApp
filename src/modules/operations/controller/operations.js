@@ -299,49 +299,55 @@ export const getUserPosts = async (req, res, next) => {
 //====================================================================================================================//
 //add comment
 
+const getModelFromRole = (role) => {
+  const roleToModelMap = {
+    admin: "Admin",
+    superAdmin: "Admin",
+    employee: "Employee",
+    user: "User",
+  };
+  return roleToModelMap[role] || null;
+};
+
 export const createComment = asyncHandler(async (req, res, next) => {
   const { postId } = req.params;
   const { commentContent } = req.body;
 
   const post = await postModel.findById(postId);
   if (!post) {
-    return next(new Error("Invalid post ID", { cause: 400 }));
+    return next(new Error("Invalid post ID. Please provide a valid post.", { cause: 400 }));
   }
-  const roleToModelMap = {
-    admin: "Admin",
-    superAdmin: "Admin", 
-    employee: "Employee",
-    user: "User",
-  };
-  
-  const createdByModel = roleToModelMap[req.user.role];
-  
+
+
+  if (!commentContent || commentContent.trim() === "") {
+    return next(new Error("Comment content is required.", { cause: 400 }));
+  }
+
+  const createdByModel = getModelFromRole(req.user.role);
   if (!createdByModel) {
-    return next(
-      new Error(
-        "Invalid user role",
-        { cause: 400 }
-      )
-    );
+    return next(new Error("User role is not authorized to create comments.", { cause: 403 }));
   }
 
   const comment = await commentModel.create({
     author: req.user.userName,
     createdBy: req.user._id,
-    createdByModel, 
+    createdByModel,
     commentContent,
     postId,
   });
 
+  // Link comment to the post
   post.comments.push(comment._id);
   await post.save();
 
-  return res.status(201).json({
+  // Response with success
+  res.status(201).json({
     status: "success",
-    message: "Comment created successfully",
+    message: "Comment created successfully.",
     comment,
   });
 });
+
 //====================================================================================================================//
 //get post comments
 
@@ -375,27 +381,25 @@ export const getComments=asyncHandler(async(req,res,next)=>
 //====================================================================================================================//
 //create reply
 
-export let createReplyComment = asyncHandler(async (req, res, next) => {
-  let { commentId } = req.params;
-  let { commentContent } = req.body;
+export const createReplyComment = asyncHandler(async (req, res, next) => {
+  const { commentId } = req.params;
+  const { commentContent } = req.body;
 
-  let comment = await commentModel.findOne({ _id: commentId });
+  const comment = await commentModel.findOne({ _id: commentId });
   if (!comment) {
-    return next(new Error("In-valid comment ID", { cause: 400 }));
+    return next(new Error("Invalid comment ID. Please provide a valid comment.", { cause: 400 }));
   }
+  
+  
+  if (!commentContent || commentContent.trim() === "") {
+    return next(new Error("Reply content is required.", { cause: 400 }));
+  }
+  
+  const createdByModel = getModelFromRole(req.user.role);
+  if (!createdByModel) {
+    return next(new Error("User role is not authorized to create comments.", { cause: 403 }));
+  }    
 
-  let createdByModel;
-  if (req.user.role ===( "admin"  || "superAdmin")) {
-    createdByModel = "Admin";
-  } else if (req.user.role === "employee") {
-    createdByModel = "Employee";
-  } else if (req.user.role === "user") {
-    createdByModel = "User";
-  } else {
-    return next(
-      new Error("Invalid user role. Must be one of 'Admin', 'Employee', or 'User'.", { cause: 400 })
-    );
-  }
 
   let replyComment = await commentModel.create({
     commentContent,

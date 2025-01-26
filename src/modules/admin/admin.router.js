@@ -117,7 +117,7 @@ router.get(
 
 //send notification to user or employee
 router.post(
-  "/createNotification/:recipientType/:recipientId",
+  "/createNotification",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
   isValid(createNotificationSchema),

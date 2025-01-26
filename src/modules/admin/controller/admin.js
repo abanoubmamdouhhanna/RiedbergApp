@@ -320,37 +320,36 @@ export const getAllMaintenances = asyncHandler(async (req, res, next) => {
 
 export const createNotification = asyncHandler(async (req, res, next) => {
   const { notifyTitle, notifyDescription } = req.body;
-  const { recipientType, recipientId } = req.params;
+ try {
+    const io = req.app.get("io");
+    if (!io) throw new Error("Socket.IO instance not found");
 
-  let recipientModel;
-  if (recipientType === "user") {
-    recipientModel = userModel;
-  } else if (recipientType === "employee") {
-    recipientModel = employeeModel;
-  } else {
-    return next(new Error("Invalid recipient type", { cause: 400 }));
+    const users = await userModel.find({}, "_id");
+    const employees = await employeeModel.find({}, "_id");
+
+    const recipientIds = [
+      ...users.map((user) => user._id.toString()),
+      ...employees.map((emp) => emp._id.toString()),
+    ];
+
+    if (io) {
+      recipientIds.forEach((recipientId) => {
+        io.to(recipientId).emit("notification", {
+          title: notifyTitle,
+          description:notifyDescription,
+          createdAt: new Date(),
+        });
+      });
+    }
+  } catch (error) {
+    return next(new Error("Failed to send notifications", { cause: 500 }));
   }
-
-  const recipient = await recipientModel.findById(recipientId);
-  if (!recipient) {
-    return next(new Error("Invalid recipient ID", { cause: 404 }));
-  }
-
   const createNotification = await notificationModel.create({
     notifyTitle,
     notifyDescription,
     createdBy: req.user._id,
-    [`${recipientType}Id`]: recipient._id,
-    receieverType: recipient.role,
   });
-  const io = req.app.get("io");
-  if (io) {
-    io.to(recipientId).emit("notification", {
-      title: notifyTitle,
-      description: notifyDescription,
-      createdAt: new Date(),
-    });
-  }
+
   return res.status(200).json({
     status: "success",
     message: "Notification created",
