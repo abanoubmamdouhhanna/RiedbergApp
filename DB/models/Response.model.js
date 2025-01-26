@@ -19,6 +19,11 @@ const responseSchema = new Schema(
       ],
       required: true,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: 86400,
+    },
   },
   { timestamps: true }
 );

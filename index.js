@@ -6,6 +6,7 @@ import cors from 'cors'
 import http from "http";
 import { Server } from "socket.io";
 import initApp from "./src/app.router.js";
+import { startCleanupJob } from "./src/utils/cleanupJobs.js";
 
 // Set directory dirname
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,13 +37,13 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
   });
-  
+
   socket.on("error", (err) => {
     console.error(`Socket.IO Error: ${err.message}`);
   });
 });
 
-
+startCleanupJob();
 initApp(app, express);
 
 server.listen(port, () => {
