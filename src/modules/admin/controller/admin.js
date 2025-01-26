@@ -321,6 +321,11 @@ export const getAllMaintenances = asyncHandler(async (req, res, next) => {
 
 export const createNotification = asyncHandler(async (req, res, next) => {
   const { notifyTitle, notifyDescription } = req.body;
+  const createNotification = await notificationModel.create({
+    notifyTitle,
+    notifyDescription,
+    createdBy: req.user._id,
+  });
  try {
     const io = req.app.get("io");
     if (!io) throw new Error("Socket.IO instance not found");
@@ -335,9 +340,9 @@ export const createNotification = asyncHandler(async (req, res, next) => {
 
     if (io) {
       recipientIds.forEach((recipientId) => {
-        io.to(recipientId).emit("notification", {
-          title: notifyTitle,
-          description:notifyDescription,
+        io.to(recipientId).emit("emergencyNotification", {
+          title: createNotification.notifyTitle,
+          description:createNotification.notifyDescription,
           createdAt: new Date(),
         });
       });
@@ -345,11 +350,7 @@ export const createNotification = asyncHandler(async (req, res, next) => {
   } catch (error) {
     return next(new Error("Failed to send notifications", { cause: 500 }));
   }
-  const createNotification = await notificationModel.create({
-    notifyTitle,
-    notifyDescription,
-    createdBy: req.user._id,
-  });
+
 
   return res.status(200).json({
     status: "success",
