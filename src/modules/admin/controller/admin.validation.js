@@ -94,8 +94,8 @@ export const changeStatusSchema = joi
 
 export const createNotificationSchema = joi
   .object({
-    notifyTitle: joi.string().required(),
-    notifyDescription: joi.string().required(),
+    notifyTitle: joi.string(),
+    notifyDescription: joi.string(),
   })
   .required()
   .messages({

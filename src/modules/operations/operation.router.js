@@ -11,6 +11,7 @@ import {
   deletePostSchema,
   geSpGallerySchema,
   getAnnouncementSchema,
+  handleResponsetSchema,
   headersSchema,
   likeSchema,
   PostLikeSchema,
@@ -228,6 +229,14 @@ router.get("/getAllAnnouncement",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin", "employee", "user"]),
   operationController.getAllAnnouncement
+)
+
+//get all announcement
+router.post("/handleResponse",
+  isValid(headersSchema, true),
+  auth(["employee", "user"]),
+  isValid(handleResponsetSchema),
+  operationController.handleResponse
 )
 
 export default router;

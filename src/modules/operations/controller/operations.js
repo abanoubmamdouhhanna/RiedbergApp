@@ -9,6 +9,8 @@ import userModel from "../../../../DB/models/User.model.js";
 import employeeModel from "../../../../DB/models/Employee.model.js";
 import adminModel from "../../../../DB/models/Admin.model.js";
 import announcementModel from "../../../../DB/models/Announcements.model.js";
+import notificationModel from "../../../../DB/models/Notification.model.js";
+import responseModel from "../../../../DB/models/Response.model.js";
 
 //profile
 
@@ -91,7 +93,7 @@ export const addPost = asyncHandler(async (req, res, next) => {
   }
   req.body.createdBy = req.user._id;
   req.body.authorType = req.user.role;
-  req.body.customId=customId
+  req.body.customId = customId;
 
   const roleToModelMap = {
     admin: "Admin",
@@ -99,18 +101,13 @@ export const addPost = asyncHandler(async (req, res, next) => {
     employee: "Employee",
     user: "User",
   };
-  
+
   const createdByModel = roleToModelMap[req.user.role];
-  
+
   if (!createdByModel) {
-    return next(
-      new Error(
-        "Invalid user role",
-        { cause: 400 }
-      )
-    );
+    return next(new Error("Invalid user role", { cause: 400 }));
   }
-req.body.createdByModel=createdByModel
+  req.body.createdByModel = createdByModel;
 
   const addPost = await postModel.create(req.body);
   return res.status(201).json({
@@ -203,19 +200,19 @@ const populateAllReplies = (depth) => {
 //allPosts
 
 export const allPosts = asyncHandler(async (req, res, next) => {
-  const userId = req.user._id; 
+  const userId = req.user._id;
   const posts = await postModel
     .find()
     .populate({
-      path: "createdBy", 
-      select: "userName email phone", 
+      path: "createdBy",
+      select: "userName email phone",
     })
     .populate({
       path: "comments",
       populate: [
         {
-          path: "createdBy", 
-          select: "userName email phone", 
+          path: "createdBy",
+          select: "userName email phone",
         },
         {
           path: "reply",
@@ -245,8 +242,6 @@ export const allPosts = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ message: "All posts", result: postsWithUserInteraction });
 });
-
-
 
 //====================================================================================================================//
 //get user posts
@@ -315,9 +310,10 @@ export const createComment = asyncHandler(async (req, res, next) => {
 
   const post = await postModel.findById(postId);
   if (!post) {
-    return next(new Error("Invalid post ID. Please provide a valid post.", { cause: 400 }));
+    return next(
+      new Error("Invalid post ID. Please provide a valid post.", { cause: 400 })
+    );
   }
-
 
   if (!commentContent || commentContent.trim() === "") {
     return next(new Error("Comment content is required.", { cause: 400 }));
@@ -325,7 +321,11 @@ export const createComment = asyncHandler(async (req, res, next) => {
 
   const createdByModel = getModelFromRole(req.user.role);
   if (!createdByModel) {
-    return next(new Error("User role is not authorized to create comments.", { cause: 403 }));
+    return next(
+      new Error("User role is not authorized to create comments.", {
+        cause: 403,
+      })
+    );
   }
 
   const comment = await commentModel.create({
@@ -351,33 +351,31 @@ export const createComment = asyncHandler(async (req, res, next) => {
 //====================================================================================================================//
 //get post comments
 
-export const getComments=asyncHandler(async(req,res,next)=>
-{
-  const {postId}=req.params
-  const post=await postModel.findById(postId)
+export const getComments = asyncHandler(async (req, res, next) => {
+  const { postId } = req.params;
+  const post = await postModel.findById(postId);
   if (!post) {
     return next(new Error("Invalid post ID", { cause: 400 }));
-
   }
 
-  const comments =await commentModel.find({postId, isReply: false})
-  .populate({
-    path: "reply",
-    populate: [
+  const comments = await commentModel
+    .find({ postId, isReply: false })
+    .populate({
+      path: "reply",
+      populate: [
         {
-        path: "reply",
-        populate: populateAllReplies(10),
-      },
-    ],
-  });
+          path: "reply",
+          populate: populateAllReplies(10),
+        },
+      ],
+    });
 
   return res.status(200).json({
     status: "success",
     message: "All post comments",
     comments,
   });
-
-})
+});
 //====================================================================================================================//
 //create reply
 
@@ -387,19 +385,25 @@ export const createReplyComment = asyncHandler(async (req, res, next) => {
 
   const comment = await commentModel.findOne({ _id: commentId });
   if (!comment) {
-    return next(new Error("Invalid comment ID. Please provide a valid comment.", { cause: 400 }));
+    return next(
+      new Error("Invalid comment ID. Please provide a valid comment.", {
+        cause: 400,
+      })
+    );
   }
-  
-  
+
   if (!commentContent || commentContent.trim() === "") {
     return next(new Error("Reply content is required.", { cause: 400 }));
   }
-  
+
   const createdByModel = getModelFromRole(req.user.role);
   if (!createdByModel) {
-    return next(new Error("User role is not authorized to create comments.", { cause: 403 }));
-  }    
-
+    return next(
+      new Error("User role is not authorized to create comments.", {
+        cause: 403,
+      })
+    );
+  }
 
   let replyComment = await commentModel.create({
     commentContent,
@@ -407,7 +411,7 @@ export const createReplyComment = asyncHandler(async (req, res, next) => {
     createdBy: req.user._id,
     createdByModel,
     author: req.user.userName,
-    isReply:true
+    isReply: true,
   });
   comment.reply.push(replyComment);
   await comment.save();
@@ -424,12 +428,10 @@ export const getReplies = asyncHandler(async (req, res, next) => {
     return next(new Error("Invalid comment ID", { cause: 400 }));
   }
 
-  const populatedComment = await commentModel
-    .findById(commentId)
-    .populate({
-      path: "reply",
-      select: "author commentContent likes unlikes createdAt", 
-    });
+  const populatedComment = await commentModel.findById(commentId).populate({
+    path: "reply",
+    select: "author commentContent likes unlikes createdAt",
+  });
 
   return res.status(200).json({
     status: "success",
@@ -552,8 +554,8 @@ export const addMaintenance = asyncHandler(async (req, res, next) => {
     req.body.maintenanceImage = maintenanceImage.secure_url;
   }
   req.body.createdBy = req.user._id;
-  req.body.customId=customId
-   const addMaintenance = await maintenanceModel.create(req.body);
+  req.body.customId = customId;
+  const addMaintenance = await maintenanceModel.create(req.body);
   return res.status(201).json({
     status: "success",
     message: "Maintenance created successfully",
@@ -601,8 +603,7 @@ export const updateMaintenance = asyncHandler(async (req, res, next) => {
 //get maintenance
 
 export const getMaintenance = asyncHandler(async (req, res, next) => {
-
-  const maintenance = await maintenanceModel.find({createdBy:req.user._id});
+  const maintenance = await maintenanceModel.find({ createdBy: req.user._id });
   if (!maintenance) {
     return next(
       new Error("no maintenances found", {
@@ -659,4 +660,45 @@ export const getAllAnnouncement = asyncHandler(async (req, res, next) => {
     count: announcement.length,
     result: announcement,
   });
+});
+
+//====================================================================================================================//
+// Endpoint to handle user/employee responses
+
+export const handleResponse = asyncHandler(async (req, res, next) => {
+  const { notificationId, status } = req.body;
+
+  try {
+    const io = req.app.get("io");
+    if (!io) throw new Error("Socket.IO instance not found");
+
+    const notification = await notificationModel.findById(notificationId);
+    if (!notification) {
+      return next(new Error("Invalid notification ID", { cause: 400 }));
+    }
+
+    const response = await responseModel.create({
+      userId: req.user._id,
+      userType: req.user.role,
+      userName: req.user.userName,
+      notificationId,
+      status,
+    });
+
+    // Emit response to the admin in real-time
+    io.to("adminRoom").emit("statusUpdate", {
+      userId: req.user._id,
+      userName: req.user.userName,
+      status,
+      createdAt: new Date(),
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Response sent successfully",
+      result: response,
+    });
+  } catch (error) {
+    return next(new Error("Failed to send response", { cause: 500 }));
+  }
 });

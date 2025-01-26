@@ -93,8 +93,6 @@ export const PostLikeSchema = joi
 
 export const addMaintenanceSchema = joi
   .object({
-
-   
     categoryName: joi
       .string()
       .valid("Pluming", "Electrical", "Heating", "Other") // Allowed values
@@ -132,17 +130,13 @@ export const addMaintenanceSchema = joi
           "Maintenance order status must be one of ['Pending', 'Accepted', 'In-Progress', 'Completed', 'Cancelled'].",
         "any.required": "Maintenance order status is required.",
       }),
-      notes: joi
-      .string()
-      .optional() 
-      .messages({
-        "string.base": "Notes must be a string.",
-      }),
+    notes: joi.string().optional().messages({
+      "string.base": "Notes must be a string.",
+    }),
 
     file: joi.object({
       maintenanceImage: joi.array().items(generalFeilds.file).length(1),
-
-  }),
+    }),
   })
   .required()
   .messages({
@@ -186,29 +180,48 @@ export const updateMaintenanceSchema = joi
           "Maintenance order status must be one of ['Pending', 'Accepted', 'In-Progress', 'Completed', 'Cancelled'].",
         "any.required": "Maintenance order status is required.",
       }),
-      notes: joi
-      .string()
-      .optional() 
-      .messages({
-        "string.base": "Notes must be a string.",
-      }),
-      
+    notes: joi.string().optional().messages({
+      "string.base": "Notes must be a string.",
+    }),
+
     file: joi.object({
       maintenanceImage: joi.array().items(generalFeilds.file).length(1),
 
-      notes:joi.string()
+      notes: joi.string(),
     }),
   })
   .required()
   .messages({
     "object.base": "Input must be a valid object.",
   });
-  
-  export const getAnnouncementSchema = joi
-    .object({
-      announcementId: generalFeilds.id,
-    })
-    .required()
-    .messages({
-      "object.base": "Input must be a valid object.",
-    });
+
+export const getAnnouncementSchema = joi
+  .object({
+    announcementId: generalFeilds.id,
+  })
+  .required()
+  .messages({
+    "object.base": "Input must be a valid object.",
+  });
+
+export const handleResponsetSchema = joi
+  .object({
+    notificationId: generalFeilds.id,
+    status: joi
+      .string()
+      .valid(
+        "1. I am Safe, and at the Gathering Point",
+        "2. I am outside the building (in the city)",
+        "3. I need help"
+      ) // Allowed values
+      .default("1. I am Safe, and at the Gathering Point")
+      .messages({
+        "any.only":
+          "Status must be one of [1. I am Safe, and at the Gathering Point - 2. I am outside the building (in the city) - 3. I need help]",
+        "any.required": "Status is required.",
+      }),
+  })
+  .required()
+  .messages({
+    "object.base": "Input must be a valid object.",
+  });

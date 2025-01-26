@@ -4,11 +4,11 @@ const notificationSchema = new Schema(
   {
     notifyTitle: {
       type: String,
-      required: true,
+      default:"A fire has been reported in the building."
     },
     notifyDescription: {
       type: String,
-      required: true,
+      default:"Please evacuate immediately using the nearest emergency exit to the gathering Point. Await further instructions"
     },
     createdBy: { type: Types.ObjectId, ref: "Admin", required: true },
     isDeleted: { type: Boolean, default: false },
