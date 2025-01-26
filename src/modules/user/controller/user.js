@@ -164,7 +164,7 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
   if (!employee) {
     return next(new Error("Employee not found.", { cause: 404 }));
   }
-  
+
   if ( existingSchedule &&
     existingSchedule.schedule.some((s) => Array.isArray(s.times) && s.times.includes(appoinmentTime))) {
     return next(
@@ -252,7 +252,7 @@ export const usersIds=asyncHandler(async(req,res,next)=>
 
 export const userAppoinments=asyncHandler(async(req,res,next)=>
 {
-  const userAppoinments =await appoinmentModel.find({createdBy:req.user._id})
+  const userAppoinments =await appoinmentModel.find({createdBy:req.user._id}).populate("empDetails", "userName email phone");
   if (!userAppoinments) {
     return next(new Error("You havn't any appoinments", { cause: 404 }));
   }
