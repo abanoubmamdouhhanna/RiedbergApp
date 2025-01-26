@@ -195,4 +195,11 @@ router.get("/getAllAppoinments",
   adminController.getAllAppoinments
 )
 
+//get all responses
+router.get("/getAllResponses",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  adminController.getAllResponses
+)
+
 export default router;

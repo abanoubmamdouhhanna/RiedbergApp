@@ -231,7 +231,7 @@ router.get("/getAllAnnouncement",
   operationController.getAllAnnouncement
 )
 
-//get all announcement
+//Response
 router.post("/handleResponse",
   isValid(headersSchema, true),
   auth(["employee", "user"]),

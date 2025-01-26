@@ -210,14 +210,13 @@ export const handleResponsetSchema = joi
     status: joi
       .string()
       .valid(
-        "1. I am Safe, and at the Gathering Point",
-        "2. I am outside the building (in the city)",
-        "3. I need help"
+        "I am Safe, and at the Gathering Point",
+        "I am outside the building (in the city)",
+        "I need help"
       ) // Allowed values
-      .default("1. I am Safe, and at the Gathering Point")
       .messages({
         "any.only":
-          "Status must be one of [1. I am Safe, and at the Gathering Point - 2. I am outside the building (in the city) - 3. I need help]",
+          "Status must be one of [I am Safe, and at the Gathering Point - I am outside the building (in the city) - I need help]",
         "any.required": "Status is required.",
       }),
   })

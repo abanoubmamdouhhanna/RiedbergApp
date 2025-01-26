@@ -13,9 +13,9 @@ const responseSchema = new Schema(
     status: {
       type: String,
       enum: [
-        "1. I am Safe, and at the Gathering Point",
-        "2. I am outside the building (in the city)",
-        "3. I need help",
+        "I am Safe, and at the Gathering Point",
+        "I am outside the building (in the city)",
+        "I need help",
       ],
       required: true,
     },

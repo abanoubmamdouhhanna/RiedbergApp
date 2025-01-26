@@ -11,6 +11,7 @@ import announcementModel from "../../../../DB/models/Announcements.model.js";
 import { compare, Hash } from "../../../utils/Hash&Compare.js";
 import { Server } from "socket.io";
 import appoinmentModel from "../../../../DB/models/Appointment.model.js";
+import responseModel from "../../../../DB/models/Response.model.js";
 
 //update admin
 export const updateAdmin = asyncHandler(async (req, res, next) => {
@@ -696,3 +697,20 @@ export const getAllAppoinments =asyncHandler(async(req,res,next)=>
     result: appoinments,
   });
 })
+
+//====================================================================================================================//
+//get all Responses
+
+export const getAllResponses =asyncHandler(async(req,res,next)=>
+  {
+    const responses=await responseModel.find()
+    if (!responses) {
+      return next(new Error("No responses found!", { cause: 404 }));
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Done!",
+      count:responses.length,
+      result: responses,
+    });
+  })
