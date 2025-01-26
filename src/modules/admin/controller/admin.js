@@ -341,6 +341,7 @@ export const createNotification = asyncHandler(async (req, res, next) => {
     if (io) {
       recipientIds.forEach((recipientId) => {
         io.to(recipientId).emit("emergencyNotification", {
+          notificationId:createNotification._id,
           title: createNotification.notifyTitle,
           description:createNotification.notifyDescription,
           createdAt: new Date(),
