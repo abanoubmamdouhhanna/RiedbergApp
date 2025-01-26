@@ -5,8 +5,8 @@ const maintenanceSchema = new Schema(
     customId: String,
     categoryName: {
       type: String,
-      default: "Pluming",
-      enum: ["Pluming", "Electrical", "Heating", "Other"],
+      default: "Plumbing",
+      enum: ["Plumbing", "Electrical", "Heating", "Other"],
     },
     maintenanceDescription: {
       type: String,

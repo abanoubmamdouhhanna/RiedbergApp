@@ -135,74 +135,73 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
 
   if (!appoinmentTitle || !appoinmentDate || !appoinmentTime || !reason) {
     return next(
-      new Error("Appoinment title ,date ,time and reason are required.", {
-        cause: 400,
-      })
-    );
-  }
-  const date = new Date(appoinmentDate);
-  if (isNaN(date.getTime())) {
-    return next(
-      new Error(
-        "Invalid appoinment date. Please provide a valid date in 'YYYY-MM-DD' format.",
-        { cause: 422 }
-      )
-    );
-  }
-  if (date < new Date().setHours(0, 0, 0, 0)) {
-    return next(
-      new Error("maintenanceDay must be today or in the future.", {
+      new Error("Appoinment title, date, time and reason are required.", {
         cause: 400,
       })
     );
   }
 
-  const employee = await employeeModel.findById(employeeId);
+  const date = new Date(appoinmentDate);
+  if (isNaN(date.getTime())) {
+    return next(
+      new Error("Invalid appoinment date. Please provide a valid date.", {
+        cause: 422,
+      })
+    );
+  }
+
+  if (date < new Date().setHours(0, 0, 0, 0)) {
+    return next(new Error("Appointment date must be today or in the future.", {
+      cause: 400,
+    }));
+  }
+
+  // Concurrently fetch the employee and check the schedule for existing appointments
+  const [employee, existingSchedule] = await Promise.all([
+    employeeModel.findById(employeeId),
+    employeeModel.findOne({ _id: employeeId, "schedule.date": appoinmentDate }),
+  ]);
+
   if (!employee) {
     return next(new Error("Employee not found.", { cause: 404 }));
   }
 
-  const existingSchedule = employee.schedule.find(
-    (s) => s.date === appoinmentDate
-  );
-  if (existingSchedule && existingSchedule.times.includes(appoinmentTime)) {
-    return next(
-      new Error("The selected time is already booked for this employee.", {
-        cause: 400,
-      })
-    );
+  if (existingSchedule && existingSchedule.schedule.some((s) => s.times.includes(appoinmentTime))) {
+    return next(new Error("The selected time is already booked.", { cause: 400 }));
   }
 
+  // Handle appointment attachment upload concurrently
+  let attachmentUrl = null;
   if (appoinmentAttachment?.[0]?.path) {
-   try {
-      const uploadedAttachment = await cloudinary.uploader.upload(
-        appoinmentAttachment[0].path,
-        {
-          folder: `${process.env.APP_NAME}/Appointment/${customId}/appoinmentAttachment`,
-          public_id: `${customId}appoinmentAttachment`,
-        }
-      );
-      req.body.appoinmentAttachment = uploadedAttachment.secure_url;
+    try {
+      const uploadedAttachment = await cloudinary.uploader.upload(appoinmentAttachment[0].path, {
+        folder: `${process.env.APP_NAME}/Appointment/${customId}/appoinmentAttachment`,
+        public_id: `${customId}appoinmentAttachment`,
+      });
+      attachmentUrl = uploadedAttachment.secure_url;
     } catch (error) {
       console.error('Cloudinary Upload Error:', error);
-      return next(
-        new Error("Failed to upload appoinment attachment.", { cause: 500 })
-      );
+      return next(new Error("Failed to upload appoinment attachment.", { cause: 500 }));
     }
   }
 
   // Reserve the time slot for the employee
-  if (existingSchedule) {
-    existingSchedule.times.push(appoinmentTime);
-  } else {
-    employee.schedule.push({ date: appoinmentDate, times: [appoinmentTime] });
-  }
-  await employee.save();
+  const newSchedule = existingSchedule || { date: appoinmentDate, times: [] };
+  newSchedule.times.push(appoinmentTime);
+
+  // Save employee's new schedule concurrently
+  await employeeModel.updateOne(
+    { _id: employeeId, "schedule.date": appoinmentDate },
+    { $set: { "schedule.$": newSchedule } },
+    { upsert: true }
+  );
 
   req.body.employeeId = employeeId;
-  req.body.createdBy=req.user._id;
-  req.body.customId=customId
+  req.body.createdBy = req.user._id;
+  req.body.customId = customId;
+  req.body.appoinmentAttachment = attachmentUrl;
 
+  // Create the appointment and populate employee details
   const appoinment = await appoinmentModel.create(req.body);
   if (!appoinment) {
     return next(new Error("Failed to create appoinment.", { cause: 500 }));

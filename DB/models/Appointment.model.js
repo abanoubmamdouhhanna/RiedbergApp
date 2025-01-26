@@ -25,10 +25,20 @@ const appoinmentSchema = new Schema({
   appoinmentAttachment: String,
   createdBy:{type:Types.ObjectId,ref:"User"},
   isDeleted: { type: Boolean, default: false },
+},
+{
+  timestamps:true,toJSON: { virtuals: true }, toObject: { virtuals: true } 
 });
 appoinmentSchema.pre("find", function () {
   this.where({ isDeleted: false });
 });
+appoinmentSchema.virtual("empDetails",{
+  ref:"Employee",
+  localField:"employeeId",
+  foreignField:"_id",
+  justOne:true
+})
+
 
 const appoinmentModel =
   mongoose.models.Appoinment || model("Appoinment", appoinmentSchema);

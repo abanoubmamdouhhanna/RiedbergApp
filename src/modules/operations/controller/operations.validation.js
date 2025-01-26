@@ -95,12 +95,12 @@ export const addMaintenanceSchema = joi
   .object({
     categoryName: joi
       .string()
-      .valid("Pluming", "Electrical", "Heating", "Other") // Allowed values
-      .default("Pluming") // Default value
+      .valid("Plumbing", "Electrical", "Heating", "Other") // Allowed values
+      .default("Plumbing") // Default value
       .required()
       .messages({
         "any.only":
-          "Category name must be one of ['Pluming', 'Electrical', 'Heating', 'Other'].",
+          "Category name must be one of ['Plumbing', 'Electrical', 'Heating', 'Other'].",
         "any.required": "Category name is required.",
       }),
 
@@ -149,11 +149,11 @@ export const updateMaintenanceSchema = joi
 
     categoryName: joi
       .string()
-      .valid("Pluming", "Electrical", "Heating", "Other") // Allowed values
-      .default("Pluming") // Default value
+      .valid("Plumbing", "Electrical", "Heating", "Other") // Allowed values
+      .default("Plumbing") // Default value
       .messages({
         "any.only":
-          "Category name must be one of ['Pluming', 'Electrical', 'Heating', 'Other'].",
+          "Category name must be one of ['Plumbing', 'Electrical', 'Heating', 'Other'].",
         "any.required": "Category name is required.",
       }),
 
