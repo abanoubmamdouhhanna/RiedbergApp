@@ -52,10 +52,18 @@ const userSchema = new Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true ,toJSON: { virtuals: true }, toObject: { virtuals: true }}
 );
 userSchema.pre("find", function () {
   this.where({ isDeleted: false });
 });
+userSchema.virtual("problemDetails",{
+  ref:"Problem",
+  localField:"userProblems",
+  foreignField:"_id"
+})
+
+
+
 const userModel = mongoose.models.User || model("User", userSchema);
 export default userModel;

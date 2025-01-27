@@ -227,7 +227,7 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
 
 export const usersProfiles=asyncHandler(async(req,res,next)=>
   {
-    const usersProfiles=await userModel.find()
+    const usersProfiles=await userModel.find().populate("problemDetails")
     return res.status(200).json({
       status: "success",
       message: "Done!",
