@@ -158,7 +158,7 @@ export const addGallery = asyncHandler(async (req, res, next) => {
     }
     req.body.galleryImages = uploadedImages;
   }
-  req.body.customId=customId
+  req.body.customId = customId;
   req.body.createdBy = req.user._id;
   req.body.gallaryAuthorType = req.user.role;
   const gallery = await galleryModel.create(req.body);
@@ -326,7 +326,7 @@ export const createNotification = asyncHandler(async (req, res, next) => {
     notifyDescription,
     createdBy: req.user._id,
   });
- try {
+  try {
     const io = req.app.get("io");
     if (!io) throw new Error("Socket.IO instance not found");
 
@@ -341,9 +341,9 @@ export const createNotification = asyncHandler(async (req, res, next) => {
     if (io) {
       recipientIds.forEach((recipientId) => {
         io.to(recipientId).emit("emergencyNotification", {
-          notificationId:createNotification._id,
+          notificationId: createNotification._id,
           title: createNotification.notifyTitle,
-          description:createNotification.notifyDescription,
+          description: createNotification.notifyDescription,
           createdAt: new Date(),
         });
       });
@@ -351,7 +351,6 @@ export const createNotification = asyncHandler(async (req, res, next) => {
   } catch (error) {
     return next(new Error("Failed to send notifications", { cause: 500 }));
   }
-
 
   return res.status(200).json({
     status: "success",
@@ -380,7 +379,7 @@ export const creatAnnouncement = asyncHandler(async (req, res, next) => {
     }
   }
   req.body.author = req.user.userName;
-  req.body.customId=customId
+  req.body.customId = customId;
   req.body.createdBy = req.user._id;
   const announcement = await announcementModel.create(req.body);
 
@@ -686,33 +685,61 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 //====================================================================================================================//
 //get all appoinments
 
-export const getAllAppoinments =asyncHandler(async(req,res,next)=>
-{
-  const appoinments=await appoinmentModel.find()
+export const getAllAppoinments = asyncHandler(async (req, res, next) => {
+  const appoinments = await appoinmentModel.find();
   if (!appoinments) {
     return next(new Error("No appoinments found!", { cause: 404 }));
   }
   return res.status(200).json({
     status: "success",
     message: "Done!",
-    count:appoinments.length,
+    count: appoinments.length,
     result: appoinments,
   });
-})
+});
 
 //====================================================================================================================//
 //get all Responses
 
-export const getAllResponses =asyncHandler(async(req,res,next)=>
-  {
-    const responses=await responseModel.find()
-    if (!responses) {
-      return next(new Error("No responses found!", { cause: 404 }));
-    }
-    return res.status(200).json({
-      status: "success",
-      message: "Done!",
-      count:responses.length,
-      result: responses,
-    });
-  })
+export const getAllResponses = asyncHandler(async (req, res, next) => {
+  const responses = await responseModel.find();
+  if (!responses) {
+    return next(new Error("No responses found!", { cause: 404 }));
+  }
+  return res.status(200).json({
+    status: "success",
+    message: "Done!",
+    count: responses.length,
+    result: responses,
+  });
+});
+//====================================================================================================================//
+//Non-responders
+
+export const getNonResponders = asyncHandler(async (req, res, next) => {
+  const allUsers = await userModel.find({}, "_id userName");
+  const allEmployees = await employeeModel.find({}, "_id userName");
+
+  const responses = await responseModel.find({}, "userId userType");
+
+  const respondedUserIds = responses
+    .filter((response) => response.userType === "user")
+    .map((response) => response.userId.toString());
+
+  const respondedEmployeeIds = responses
+    .filter((response) => response.userType === "employee")
+    .map((response) => response.userId.toString());
+
+  const nonRespondedUsers = allUsers.filter(
+    (user) => !respondedUserIds.includes(user._id.toString())
+  );
+  const nonRespondedEmployees = allEmployees.filter(
+    (employee) => !respondedEmployeeIds.includes(employee._id.toString())
+  );
+  return res.status(200).json({
+    status: "success",
+    message: "Non-responders fetched successfully",
+    nonRespondedUsers,
+    nonRespondedEmployees,
+  });
+});

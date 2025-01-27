@@ -189,17 +189,27 @@ router.patch(
 );
 
 //get all appointments
-router.get("/getAllAppoinments",
+router.get(
+  "/getAllAppoinments",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
   adminController.getAllAppoinments
-)
+);
 
 //get all responses
-router.get("/getAllResponses",
+router.get(
+  "/getAllResponses",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
   adminController.getAllResponses
-)
+);
+
+//Non-responders
+router.get(
+  "/getNonResponders",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  adminController.getNonResponders
+);
 
 export default router;
