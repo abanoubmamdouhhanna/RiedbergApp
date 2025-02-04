@@ -194,12 +194,20 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
   const newSchedule = existingSchedule?.schedule?.[0] || { date: appoinmentDate, times: [] };
   newSchedule.times.push(appoinmentTime);
 
-  await employeeModel.updateOne(
-    { _id: employeeId, "schedule.date": appoinmentDate },
-    { $set: { "schedule.$": newSchedule } },
-    { upsert: true }
-  );
-
+  if (existingSchedule) {
+    // Update existing schedule
+    await employeeModel.updateOne(
+      { _id: employeeId, "schedule.date": appoinmentDate },
+      { $set: { "schedule.$.times": newSchedule.times } }
+    );
+  } else {
+    // Create a new schedule entry
+    await employeeModel.updateOne(
+      { _id: employeeId },
+      { $push: { schedule: { date: appoinmentDate, times: [appoinmentTime] } } }
+    );
+  }
+  
   req.body.employeeId = employeeId;
   req.body.createdBy=req.user._id;
   req.body.customId=customId
