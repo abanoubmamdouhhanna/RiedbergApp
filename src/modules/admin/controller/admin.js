@@ -12,6 +12,7 @@ import { compare, Hash } from "../../../utils/Hash&Compare.js";
 import { Server } from "socket.io";
 import appoinmentModel from "../../../../DB/models/Appointment.model.js";
 import responseModel from "../../../../DB/models/Response.model.js";
+import postModel from "../../../../DB/models/Post.model.js";
 
 //update admin
 export const updateAdmin = asyncHandler(async (req, res, next) => {
@@ -315,6 +316,38 @@ export const getAllMaintenances = asyncHandler(async (req, res, next) => {
     result: maintenance,
   });
 });
+//====================================================================================================================//
+//delete all maintenances
+export const delAllMaintenance =asyncHandler(async(req,res,next)=>
+  {
+    const deletedMaintenances=await maintenanceModel.deleteMany()
+    return res.status(200).json({
+      status: "success",
+      message: "All maintenances deleted successfully.",
+      result: deletedMaintenances,
+    });
+  })
+  //====================================================================================================================//
+//delete sp maintenances
+export const deleteSpMaintenance =asyncHandler(async(req,res,next)=>
+  {
+    const maintenance = await maintenanceModel.findById(
+      req.params.maintenanceId
+    );
+    if (!maintenance) {
+      return next(new Error("Maintenance not found", { cause: 404 }));
+    }
+    // Delete sp maintenance
+    const deletedMaintenances = await maintenanceModel.deleteOne({
+      _id: req.params.maintenanceId,
+    });
+  
+    return res.status(200).json({
+      status: "success",
+      message: "Maintenance deleted successfully.",
+      result: deletedMaintenances,
+    });
+  })
 
 //====================================================================================================================//
 //send notification to user or employee
@@ -480,7 +513,7 @@ export const deleteSpAnnouncement = asyncHandler(async (req, res, next) => {
   if (!announcement) {
     return next(new Error("Announcement not found", { cause: 404 }));
   }
-  // Delete all announcements
+  // Delete sp announcement
   const deletedAnnouncements = await announcementModel.deleteOne({
     _id: req.params.announcementId,
   });
@@ -742,5 +775,18 @@ export const getNonResponders = asyncHandler(async (req, res, next) => {
     message: "Non-responders fetched successfully",
     nonRespondedUsers,
     nonRespondedEmployees,
+  });
+});
+//====================================================================================================================//
+//delete all posts
+
+export const deleteAllPosts = asyncHandler(async (req, res, next) => {
+  // Delete all posts
+  const deletedPosts = await postModel.deleteMany();
+
+  return res.status(200).json({
+    status: "success",
+    message: "All posts deleted successfully.",
+    result: deletedPosts,
   });
 });

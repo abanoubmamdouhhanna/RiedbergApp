@@ -26,6 +26,23 @@ export const createEmployee = asyncHandler(async (req, res, next) => {
     return next(new Error("Username already exists", { cause: 409 }));
   }
 
+  const requiredFields = [
+    { key: "userName", value: userName },
+    { key: "email", value: email },
+    { key: "phone", value: phone },
+    { key: "password", value: password },
+    { key: "languages", value: Array.isArray(languages) && languages.length > 0 },
+    { key: "days", value: Array.isArray(days) && days.length > 0 },
+    { key: "workSpecialization", value: Array.isArray(workSpecialization) && workSpecialization.length > 0 }
+  ];
+  
+  // Find the first missing field
+  const missingField = requiredFields.find(field => !field.value);
+  
+  if (missingField) {
+    return next(new Error(`${missingField.key} is required`, { cause: 400 }));
+  }
+  
   // Hash password
   const hashPassword = Hash({ plainText: password });
   // Create the employee in the database
@@ -272,3 +289,4 @@ export const getAvailableTimes = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ status: "success", availableTimes });
 });
+

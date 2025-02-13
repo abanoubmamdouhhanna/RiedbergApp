@@ -12,6 +12,7 @@ import {
   deleteAdminSchema,
   deleteGallerySchema,
   deleteSpAnnouncementSchema,
+  deleteSpMaintenanceSchema,
   headersSchema,
   updateAdminSchema,
   updateAnnouncementSchema,
@@ -115,6 +116,22 @@ router.get(
   adminController.getAllMaintenances
 );
 
+//delete maintenance
+router.delete(
+  "/delAllMaintenance",
+  isValid(headersSchema, true),
+  auth(["admin","superAdmin"]),
+  adminController.delAllMaintenance
+);
+
+//delete sp maintenance
+router.delete(
+  "/deleteSpMaintenance/:maintenanceId",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  isValid(deleteSpMaintenanceSchema),
+  adminController.deleteSpMaintenance
+);
 //send notification to user or employee
 router.post(
   "/createNotification",
@@ -210,6 +227,14 @@ router.get(
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
   adminController.getNonResponders
+);
+
+//delete all posts
+router.delete(
+  "/deleteAllPosts",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  adminController.deleteAllPosts
 );
 
 export default router;

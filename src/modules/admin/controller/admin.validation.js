@@ -91,6 +91,14 @@ export const changeStatusSchema = joi
   .messages({
     "object.base": "Input must be a valid object.",
   });
+  export const deleteSpMaintenanceSchema = joi
+  .object({
+    maintenanceId: generalFeilds.id.required(),
+  })
+  .required()
+  .messages({
+    "object.base": "Input must be a valid object.",
+  });
 
 export const createNotificationSchema = joi
   .object({

@@ -5,43 +5,43 @@ export const headersSchema = generalFeilds.headers;
 
 export const createEmployeeSchema = joi
   .object({
-    userName: generalFeilds.userName.required(),
+    userName: generalFeilds.userName,
 
-    email: generalFeilds.email.required(),
+    email: generalFeilds.email,
 
-    password: generalFeilds.password.required(),
+    password: generalFeilds.password,
 
-    workSpecialization:joi.array().required(),
+    workSpecialization:joi.array(),
 
-    cPassword: generalFeilds.cPassword.valid(joi.ref("password")).required(),
+    cPassword: generalFeilds.cPassword.valid(joi.ref("password")),
 
-    phone: generalFeilds.phone.required(),
+    phone: generalFeilds.phone,
 
     languages: joi
       .array()
       .items(
         joi
           .string()
-          .valid(
-            "English",
-            "Mandarin Chinese",
-            "Spanish",
-            "Hindi",
-            "Arabic",
-            "French",
-            "Bengali",
-            "Russian",
-            "Portuguese",
-            "Urdu",
-            "Japanese",
-            "German",
-            "Korean",
-            "Italian",
-            "Turkish"
-          )
-          .default("Arabic")
+          // .valid(
+          //   "English",
+          //   "Mandarin Chinese",
+          //   "Spanish",
+          //   "Hindi",
+          //   "Arabic",
+          //   "French",
+          //   "Bengali",
+          //   "Russian",
+          //   "Portuguese",
+          //   "Urdu",
+          //   "Japanese",
+          //   "German",
+          //   "Korean",
+          //   "Italian",
+          //   "Turkish"
+          // )
+          // .default("Arabic")
       )
-      .required(),
+      ,
 
     days: joi
       .array()
@@ -59,7 +59,7 @@ export const createEmployeeSchema = joi
           )
           .default("Saturday")
       )
-      .required(),
+      ,
   })
   .required()
   .messages({
@@ -91,24 +91,24 @@ export const updateEmployeeSchema = joi
       .items(
         joi
           .string()
-          .valid(
-            "English",
-            "Mandarin Chinese",
-            "Spanish",
-            "Hindi",
-            "Arabic",
-            "French",
-            "Bengali",
-            "Russian",
-            "Portuguese",
-            "Urdu",
-            "Japanese",
-            "German",
-            "Korean",
-            "Italian",
-            "Turkish"
-          )
-          .default("Arabic")
+          // .valid(
+          //   "English",
+          //   "Mandarin Chinese",
+          //   "Spanish",
+          //   "Hindi",
+          //   "Arabic",
+          //   "French",
+          //   "Bengali",
+          //   "Russian",
+          //   "Portuguese",
+          //   "Urdu",
+          //   "Japanese",
+          //   "German",
+          //   "Korean",
+          //   "Italian",
+          //   "Turkish"
+          // )
+          // .default("Arabic")
       ),
     days: joi
       .array()
