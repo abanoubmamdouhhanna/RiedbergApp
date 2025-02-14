@@ -120,7 +120,7 @@ router.get(
 router.delete(
   "/delAllMaintenance",
   isValid(headersSchema, true),
-  auth(["admin","superAdmin"]),
+  auth(["admin", "superAdmin"]),
   adminController.delAllMaintenance
 );
 
@@ -237,4 +237,26 @@ router.delete(
   adminController.deleteAllPosts
 );
 
+//add privacy
+router.post(
+  "/addPrivacy",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin"]),
+  adminController.addPrivacy
+);
+//get privacy
+router.get(
+  "/getPrivacy",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin","user","employee"]),
+  adminController.getPrivacy
+);
+
+//get sp privacy
+router.get(
+  "/getSpPrivacy/:privacyId",
+  isValid(headersSchema, true),
+  auth(["admin", "superAdmin","user","employee"]),
+  adminController.getSpPrivacy
+);
 export default router;

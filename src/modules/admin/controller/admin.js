@@ -13,6 +13,7 @@ import { Server } from "socket.io";
 import appoinmentModel from "../../../../DB/models/Appointment.model.js";
 import responseModel from "../../../../DB/models/Response.model.js";
 import postModel from "../../../../DB/models/Post.model.js";
+import privacyModel from "../../../../DB/models/Privacy.Model.js";
 
 //update admin
 export const updateAdmin = asyncHandler(async (req, res, next) => {
@@ -790,3 +791,39 @@ export const deleteAllPosts = asyncHandler(async (req, res, next) => {
     result: deletedPosts,
   });
 });
+
+//====================================================================================================================//
+//add privacy
+export const addPrivacy=asyncHandler(async(req,res,next)=>
+{
+  const {privacy}=req.body
+  const addPrivacy=await privacyModel.create({privacy})
+  return res.status(201).json({
+    status: "success",
+    message: "privacy added successfully.",
+    result: addPrivacy,
+  });
+})
+//====================================================================================================================//
+//get privacy
+export const getPrivacy=asyncHandler(async(req,res,next)=>
+  {
+    const getPrivacy=await privacyModel.find()
+    return res.status(201).json({
+      status: "success",
+      message: "Done.",
+      result: getPrivacy,
+    });
+  })
+  //====================================================================================================================//
+//get sp privacy
+export const getSpPrivacy=asyncHandler(async(req,res,next)=>
+  {
+    const {privacyId}=req.params
+    const getSpPrivacy=await privacyModel.findById(privacyId)
+    return res.status(201).json({
+      status: "success",
+      message: "Done.",
+      result: getSpPrivacy,
+    });
+  })
