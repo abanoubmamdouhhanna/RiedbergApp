@@ -5,6 +5,7 @@ import { allowedTypesMap, fileUpload } from "../../utils/multerCloudinary.js";
 import { isValid } from "../../middlewares/validation.middleware.js";
 import {
   addGallerySchema,
+  addPrivacySchema,
   aupdateGallerySchema,
   changeStatusSchema,
   creatAnnouncementSchema,
@@ -13,6 +14,7 @@ import {
   deleteGallerySchema,
   deleteSpAnnouncementSchema,
   deleteSpMaintenanceSchema,
+  getSpPrivacySchema,
   headersSchema,
   updateAdminSchema,
   updateAnnouncementSchema,
@@ -242,6 +244,7 @@ router.post(
   "/addPrivacy",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
+  isValid(addPrivacySchema),
   adminController.addPrivacy
 );
 //get privacy
@@ -257,6 +260,7 @@ router.get(
   "/getSpPrivacy/:privacyId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin","user","employee"]),
+  isValid(getSpPrivacySchema),
   adminController.getSpPrivacy
 );
 export default router;

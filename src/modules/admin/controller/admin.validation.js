@@ -91,7 +91,7 @@ export const changeStatusSchema = joi
   .messages({
     "object.base": "Input must be a valid object.",
   });
-  export const deleteSpMaintenanceSchema = joi
+export const deleteSpMaintenanceSchema = joi
   .object({
     maintenanceId: generalFeilds.id.required(),
   })
@@ -146,7 +146,7 @@ export const updateAnnouncementSchema = joi
     announcementDesc: joi.string(),
 
     Priority: joi.string().valid("Normal", "High"),
-    
+
     type: joi
       .string()
       .valid("Information", "Event", "Maintenance")
@@ -156,7 +156,7 @@ export const updateAnnouncementSchema = joi
   .messages({
     "object.base": "Input must be a valid object.",
   });
-  
+
 export const deleteSpAnnouncementSchema = joi
   .object({
     announcementId: generalFeilds.id.required(),
@@ -210,6 +210,23 @@ export const updatePasswordSchema = joi
       .messages({
         "any.invalid": "New Password cannot be the same as Old Password.",
       }),
+  })
+  .required()
+  .messages({
+    "object.base": "Input must be a valid object.",
+  });
+
+export const addPrivacySchema = joi
+  .object({
+    privacy: joi.string(),
+  })
+  .required()
+  .messages({
+    "object.base": "Input must be a valid object.",
+  });
+  export const getSpPrivacySchema = joi
+  .object({
+    privacyId: generalFeilds.id,
   })
   .required()
   .messages({
