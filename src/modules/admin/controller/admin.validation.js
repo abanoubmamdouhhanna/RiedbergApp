@@ -218,15 +218,8 @@ export const updatePasswordSchema = joi
 
 export const addPrivacySchema = joi
   .object({
-    privacy: joi.string(),
-  })
-  .required()
-  .messages({
-    "object.base": "Input must be a valid object.",
-  });
-  export const getSpPrivacySchema = joi
-  .object({
     privacyId: generalFeilds.id,
+    privacy: joi.string(),
   })
   .required()
   .messages({

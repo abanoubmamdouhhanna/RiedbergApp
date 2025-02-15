@@ -14,7 +14,6 @@ import {
   deleteGallerySchema,
   deleteSpAnnouncementSchema,
   deleteSpMaintenanceSchema,
-  getSpPrivacySchema,
   headersSchema,
   updateAdminSchema,
   updateAnnouncementSchema,
@@ -241,12 +240,13 @@ router.delete(
 
 //add privacy
 router.post(
-  "/addPrivacy",
+  "/addPrivacy/:privacyId",
   isValid(headersSchema, true),
   auth(["admin", "superAdmin"]),
   isValid(addPrivacySchema),
   adminController.addPrivacy
 );
+
 //get privacy
 router.get(
   "/getPrivacy",
@@ -255,12 +255,4 @@ router.get(
   adminController.getPrivacy
 );
 
-//get sp privacy
-router.get(
-  "/getSpPrivacy/:privacyId",
-  isValid(headersSchema, true),
-  auth(["admin", "superAdmin","user","employee"]),
-  isValid(getSpPrivacySchema),
-  adminController.getSpPrivacy
-);
 export default router;
