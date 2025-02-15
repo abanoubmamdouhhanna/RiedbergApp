@@ -101,7 +101,7 @@ export const createAppoinmentSchema = joi
 
     appoinmentDate: joi
       .date()
-      .min("now")
+      .min(new Date().toISOString().split("T")[0])
       .messages({
         "date.base": "Appointment date must be a valid date.",
         "date.greater": "Appointment date must be today or in the future.",

@@ -156,6 +156,27 @@ export const createAppoinment = asyncHandler(async (req, res, next) => {
       })
     );
   }
+  // If appointment date is today, ensure the time is in the future
+  const now = new Date()
+   if (date.toDateString() === now.toDateString()) {
+    const [selectedHour, selectedMinute] = appoinmentTime
+      .split(":")
+      .map(Number);
+    const appointmentDateTime = new Date();
+    appointmentDateTime.setHours(selectedHour, selectedMinute, 0, 0);
+
+    if (appointmentDateTime <= now) {
+      return next(
+        new Error(
+          `Invalid appointment time. Please select a time later than the current moment (${now.getHours()}:${now
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}).`,
+          { cause: 400 }
+        )
+      );
+    }
+  }
 
   const [employee, existingSchedule] = await Promise.all([
     employeeModel.findById(employeeId),
