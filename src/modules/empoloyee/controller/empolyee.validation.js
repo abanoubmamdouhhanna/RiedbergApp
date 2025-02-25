@@ -22,25 +22,7 @@ export const createEmployeeSchema = joi
       .items(
         joi
           .string()
-          // .valid(
-          //   "English",
-          //   "Mandarin Chinese",
-          //   "Spanish",
-          //   "Hindi",
-          //   "Arabic",
-          //   "French",
-          //   "Bengali",
-          //   "Russian",
-          //   "Portuguese",
-          //   "Urdu",
-          //   "Japanese",
-          //   "German",
-          //   "Korean",
-          //   "Italian",
-          //   "Turkish"
-          // )
-          // .default("Arabic")
-      )
+         )
       ,
 
     days: joi
@@ -91,24 +73,6 @@ export const updateEmployeeSchema = joi
       .items(
         joi
           .string()
-          // .valid(
-          //   "English",
-          //   "Mandarin Chinese",
-          //   "Spanish",
-          //   "Hindi",
-          //   "Arabic",
-          //   "French",
-          //   "Bengali",
-          //   "Russian",
-          //   "Portuguese",
-          //   "Urdu",
-          //   "Japanese",
-          //   "German",
-          //   "Korean",
-          //   "Italian",
-          //   "Turkish"
-          // )
-          // .default("Arabic")
       ),
     days: joi
       .array()
